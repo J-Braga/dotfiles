@@ -10,6 +10,10 @@ return {
         foldKeymaps = {
             setup = false,
         },
+        autoFold = {
+            enabled = true,
+            kinds = { "comment", "imports" }, ---@type lsp.FoldingRangeKind[]
+        },
     },
 
     init = function()

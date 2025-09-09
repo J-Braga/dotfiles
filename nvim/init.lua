@@ -65,3 +65,6 @@ require("lazy").setup({
         },
     },
 })
+--vim.notify = require("notify")
+require("custom.rename")
+require("custom.zig_build")
