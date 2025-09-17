@@ -146,6 +146,7 @@ install_zsh() {
 			git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 			git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 		fi
+    fi
 }
 
 link_dotfiles() { 
@@ -163,7 +164,7 @@ link_dotfiles() {
 
     # Create my work alias's file if it does not exists
     #if [ ! -f ~/work_alias ]; then
-    #    touch ~/work_alias
+ 
     #fi
 
     # Link the nvim configuration
