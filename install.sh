@@ -167,7 +167,7 @@ link_dotfiles() {
 
     # Link the nvim configuration
     if [ ! -d ~/.config/nvim ]; then
-        ln -s $(pwd)/nvim ~/.config/nvim
+        ln -s $(pwd)/nvim ~/.config
     fi
 
     # Link my alacritty's if it does not exists

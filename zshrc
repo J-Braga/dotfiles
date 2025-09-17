@@ -155,11 +155,11 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # bun completions
-[ -s "/Users/jonathanbraga/.bun/_bun" ] && source "/Users/jonathanbraga/.bun/_bun"
+[ -s "~/.bun/_bun" ] && source "~/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Created by `pipx` on 2025-05-06 21:32:35
-export PATH="$PATH:/Users/jonathan.braga/.local/bin"
+export PATH="$PATH:~/.local/bin"
