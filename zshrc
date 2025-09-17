@@ -109,7 +109,9 @@ zle -N zle-line-init
 echo -ne '\e[5 q' # Use beam shape cursor on startup.
 preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
 # Edit line in vim with ctrl-e:
+#
 autoload edit-command-line; zle -N edit-command-line
+
 bindkey '^e' edit-command-line
 
 # autosuggest-execute '^ '
@@ -121,7 +123,7 @@ source ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 # Sourcing zsh-syntax-highlighting
 source ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-autoload -U +X bashcompinit && bashcompinit
+#autoload -U +X bashcompinit && bashcompinit -u
 #complete -o nospace -C /usr/local/bin/terraform terraform
 
 if [ -d ~/.config/linters/ ]; then
