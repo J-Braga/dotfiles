@@ -140,22 +140,20 @@ install_npm() {
 
 install_zsh() {
 	# Clone zsh plugins
-	if [ ! -f ~/.zshrc ]; then
-		if [ ! -d ~/.oh-my-zsh ]; then
-			sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-			git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-			git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-		fi
+    if [ ! -d ~/.oh-my-zsh ]; then
+        sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+        git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
     fi
 }
 
 link_dotfiles() { 
 
-    # Remove current zsh config file 
-    rm -f ~/.zshrc
 
-    # Link new zsh file 
-    ln -s $(pwd)/zshrc ~/.zshrc
+	if [ ! -f ~/.zshrc ]; then
+        # Link new zsh file 
+        ln -s $(pwd)/zshrc ~/.zshrc
+    fi
 
     # Link my alias's if it does not exists
     if [ ! -f ~/.config/alias ]; then
@@ -163,9 +161,9 @@ link_dotfiles() {
     fi
 
     # Create my work alias's file if it does not exists
-    #if [ ! -f ~/work_alias ]; then
- 
-    #fi
+    if [ ! -f ~/work_alias ]; then
+        touch ~/work_alias
+    fi
 
     # Link the nvim configuration
     if [ ! -d ~/.config/nvim ]; then
@@ -225,6 +223,9 @@ apply_mac_default(){
 
 }
 
+
+install_zsh
+link_dotfiles
 
 #install_tmux
 #install_lsp_on_mac
