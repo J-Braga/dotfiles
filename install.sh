@@ -141,7 +141,7 @@ install_npm() {
 install_zsh() {
 	# Clone zsh plugins
     if [ ! -d ~/.oh-my-zsh ]; then
-        sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
         git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
         git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
     fi
@@ -167,7 +167,7 @@ link_dotfiles() {
 
     # Link the nvim configuration
     if [ ! -d ~/.config/nvim ]; then
-        ln -s $(pwd)/nvim/ ~/.config/nvim/
+        ln -s $(pwd)/nvim ~/.config/nvim
     fi
 
     # Link my alacritty's if it does not exists
