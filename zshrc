@@ -41,8 +41,9 @@ zstyle ':completion:*' menu select
 zmodload zsh/complist
 _comp_options+=(globdots)		# Include hidden files.
 
-ZSH_THEME=robbyrussell
+#ZSH_THEME=robbyrussell
 #ZSH_THEME="avit"
+#ZSH_THEME=itchy
 ZSH_THEME=bira
 
 HIST_STAMPS="mm/dd/yyyy"
