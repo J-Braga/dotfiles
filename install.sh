@@ -1,60 +1,3 @@
-# prompt_install() {
-# 	echo "$1 is not installed. Would you like to install it? (y/n) " >&2
-# 	old_stty_cfg=$(stty -g)
-# 	stty raw -echo
-# 	answer=$( while ! head -c 1 | grep -i '[ny]' ;do true ;done )
-# 	stty $old_stty_cfg && echo
-# 	if echo "$answer" | grep -iq "^y" ;then
-# 		if [ ${machine} == Mac ]; then
-# 			echo
-# 		fi
-# 	fi
-# }
-
-
-# check_for_python() {
-# 	echo "Checking if Python3 version 3.9 is installed"
-# 	if ! [ -x "$(command -v python3.10)" ]; then
-# 		echo "installing python3.10"
-# 		brew install python3
-# 		brew upgrade python3 
-# 	else
-# 		echo "python3 is installed"
-# 	fi
-# }
-
-# check_default_shell() {
-# 	if [ -z "${SHELL##*zsh*}" ] ;then
-# 			echo "Default shell is zsh."
-# 	else
-# 		echo -n "Default shell is not zsh. Do you want to chsh -s \$(which zsh)? (y/n)"
-# 		old_stty_cfg=$(stty -g)
-# 		stty raw -echo
-# 		answer=$( while ! head -c 1 | grep -i '[ny]' ;do true ;done )
-# 		stty $old_stty_cfg && echo
-# 		if echo "$answer" | grep -iq "^y" ;then
-# 			chsh -s $(which zsh)
-# 		else
-# 			echo "Warning: Your configuration won't work properly. If you exec zsh, it'll exec tmux which will exec your default shell which isn't zsh."
-# 		fi
-# 	fi
-# }
-
-# echo "We're going to do the following:"
-# echo "1. Grab dependencies"
-# echo "2. Check to make sure you have brew, python3, zsh, neovim, and tmux installed"
-# echo "Let's get started? (y/n)"
-# old_stty_cfg=$(stty -g)
-# stty raw -echo
-# answer=$( while ! head -c 1 | grep -i '[ny]' ;do true ;done )
-# stty $old_stty_cfg
-# if echo "$answer" | grep -iq "^y" ;then
-# 	echo
-# else
-# 	echo "Quitting, nothing was changed."
-# 	exit 0
-# fi
-
 # Configure flake8 configuration file
 if [ ! -d ~/.config ]; then
     mkdir ~/.config
@@ -68,9 +11,6 @@ case "${unameOut}" in
 	MINGW*)     machine=MinGw;;
 	*)          machine="UNKNOWN:${unameOut}"
 esac
-# if [ ${machine} == Mac ]; then
-# fi
-
 
 install_tmux(){
   # Create a directory
@@ -117,39 +57,44 @@ install_stylua() {
 		rm stylua-macos.zip
 		chmod +x stylua
 	fi
-
 }
 
-install_npm() {
-	if [ ! -x "$(command -v nvm)"]; then
-		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-	else
-		if [ ! -x "$(command -v node)" ]; then
-			nvm install node
-		fi
-
-		if [ ! -x "$(command -v npm)" ]; then
-			nvm install-latest-npm
-			# install eslint after npm
-			npm i -g eslint
-		fi
-
-
-	fi	
-}
+#install_bun() { }
+#install_brew() { }
 
 install_zsh() {
 	# Clone zsh plugins
     if [ ! -d ~/.oh-my-zsh ]; then
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    fi
+
+    #autosuggesions plugin
+    if [ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions ]; then
+        echo "installing zsh-autosuggestions"
+        git clone https://github.com/zsh-users/zsh-autosuggestions.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
+    fi
+
+    #zsh-syntax-highlighting plugin
+    if [ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting ]; then
+        echo "installing zsh-syntax-highlighting"
         git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-        git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+    fi
+
+    #zsh-fast-syntax-highlighting plugin
+    if [ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting ]; then
+        echo "installing fast-syntax-highlighting"
+        git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting
+    fi
+
+    #zsh-autocomplete plugin
+    if [ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete ]; then
+        echo "installing zsh-autocomplete"
+        git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete
     fi
 }
 
 link_dotfiles() { 
-
-
 	if [ ! -f ~/.zshrc ]; then
         # Link new zsh file 
         ln -s $(pwd)/zshrc ~/.zshrc
@@ -171,14 +116,14 @@ link_dotfiles() {
     fi
 
     # Link my alacritty's if it does not exists
-    if [ ! -f ~/.alacritty.yml ]; then
+    if [ ! -f ~/.alacritty.toml ]; then
         ln -s $(pwd)alacritty.toml ~/.alacritty.toml
     fi
 
     # Link my tmux's if it does not exists
-    if [ ! -f ~/.tmux.conf ]; then
-        ln -s $(pwd)tmux.conf ~/.tmux.conf
-    fi
+    #if [ ! -f ~/.tmux.conf ]; then
+    #    ln -s $(pwd)tmux.conf ~/.tmux.conf
+    #fi
 }
 
 install_python(){
@@ -196,41 +141,27 @@ install_python(){
 	# fi
 }
 
-install_nvim(){ 
-	# TODO: Need to check version to update every day
-	if [ ! -d ~/.nvim-osx64 ]; then
-		curl -fsSLO https://github.com/neovim/neovim/releases/download/nightly/nvim-macos.tar.gz
-		tar xzvf nvim-macos.tar.gz
-		rm nvim-macos.tar.gz
-		mv nvim-osx64 ~/.nvim-osx64
-	fi
+#install_nvim() { }
 
-	#Install Plugin manager Packer 
-	if [ ! -d ~/.local/share/nvim/site/pack/packer/start/ ]; then 
-		git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
-	fi
-}
+apply_mac_default() {
+    defaults write com.apple.dock static-only -bool true
+    killall Dock
 
-apply_mac_default(){
-  defaults write com.apple.dock static-only -bool true
-  killall Dock
+    defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
+    killall Finder
 
-  defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
-  killall Finder
-
-  defaults write com.apple.finder _FXSortFoldersFirst -bool true
-  killall Finder
-
+    defaults write com.apple.finder _FXSortFoldersFirst -bool true
+    killall Finder
 }
 
 
-install_zsh
-link_dotfiles
+if [ ${machine} == Mac ]; then
+    install_zsh
+    link_dotfiles
+    #apply_mac_default
+ fi
 
 #install_tmux
 #install_lsp_on_mac
 #install_nvim
 
-# TODO
-
-# generate ssh-key for new deployment 

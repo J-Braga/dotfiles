@@ -15,6 +15,7 @@ check_pre_commit() {
         fi
     fi
 }
+
 # Override cd 
 cd() {
     builtin cd "$@";
@@ -36,14 +37,13 @@ setopt inc_append_history # To save every command before it is executed
 setopt share_history # setopt inc_append_history
 
 # Basic auto/tab complete:
-autoload -U compinit
 zstyle ':completion:*' menu select
 zmodload zsh/complist
-compinit
 _comp_options+=(globdots)		# Include hidden files.
 
 ZSH_THEME=robbyrussell
-# ZSH_THEME="avit"
+#ZSH_THEME="avit"
+ZSH_THEME=bira
 
 HIST_STAMPS="mm/dd/yyyy"
 
@@ -69,10 +69,14 @@ zstyle :omz:plugins:ssh-agent identities id_rsa
 plugins=(
   git
   macos
-  zsh-syntax-highlighting
   zsh-autosuggestions
+  zsh-syntax-highlighting
+  fast-syntax-highlighting
+  zsh-autocomplete
   ssh-agent
   virtualenvwrapper
+  azure
+  aws
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -118,13 +122,7 @@ bindkey '^e' edit-command-line
 # CTRL+SPACE to access autosuggest
 bindkey '^ ' autosuggest-accept
 
-source ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-
-# Sourcing zsh-syntax-highlighting
-source ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-#autoload -U +X bashcompinit && bashcompinit -u
-#complete -o nospace -C /usr/local/bin/terraform terraform
+autoload -U +X bashcompinit && bashcompinit -U
 
 if [ -d ~/.config/linters/ ]; then
   export PATH=$PATH:~/.config/linters/
@@ -142,24 +140,19 @@ if [ -d ~/.sokol-tools-bin ]; then
 fi
 
 if [ -d ~/.bin/zig ]; then
-  
   export PATH=$PATH:~/.bin/zig
-
 fi
 
 
 export PATH=$PATH:/usr/local/sbin
-#export NVIM_LISTEN_ADDRESS='/tmp/nvimsocket nvim'
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+export NVIM_LISTEN_ADDRESS='/tmp/nvimsocket nvim'
 
 # bun completions
-[ -s "~/.bun/_bun" ] && source "~/.bun/_bun"
+#[ -s "~/.bun/_bun" ] && source "~/.bun/_bun"
 
 # bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+#export BUN_INSTALL="$HOME/.bun"
+#export PATH="$BUN_INSTALL/bin:$PATH"
 
-# Created by `pipx` on 2025-05-06 21:32:35
 export PATH="$PATH:~/.local/bin"
+
