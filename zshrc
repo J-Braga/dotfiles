@@ -37,9 +37,9 @@ setopt inc_append_history # To save every command before it is executed
 setopt share_history # setopt inc_append_history
 
 # Basic auto/tab complete:
-zstyle ':completion:*' menu select
-zmodload zsh/complist
-_comp_options+=(globdots)		# Include hidden files.
+#zstyle ':completion:*' menu select
+#zmodload zsh/complist
+#_comp_options+=(globdots)		# Include hidden files.
 
 #ZSH_THEME=robbyrussell
 #ZSH_THEME="avit"
@@ -146,7 +146,7 @@ fi
 
 
 export PATH=$PATH:/usr/local/sbin
-export NVIM_LISTEN_ADDRESS='/tmp/nvimsocket nvim'
+#export NVIM_LISTEN_ADDRESS='/tmp/nvimsocket nvim'
 
 # bun completions
 #[ -s "~/.bun/_bun" ] && source "~/.bun/_bun"

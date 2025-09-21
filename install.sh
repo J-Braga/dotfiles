@@ -60,7 +60,23 @@ install_stylua() {
 }
 
 #install_bun() { }
-#install_brew() { }
+
+install_brew() {
+    if ! which brew >/dev/null 2>&1; then
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+
+    brew install font-mononoki-nerd
+
+    brew install neovim-nightly
+    
+    brew install zig
+
+    brew install lazygit
+
+    brew install uv
+
+}
 
 install_zsh() {
 	# Clone zsh plugins
@@ -92,6 +108,18 @@ install_zsh() {
         echo "installing zsh-autocomplete"
         git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete
     fi
+
+
+}
+
+install_ghostty() {
+    if ! which ghostty >/dev/null 2>&1; then
+        echo "installing ghostty"
+        brew install --cask ghostty
+        rm ~/Library/Application\ Support/com.mitchellh.ghostty/config
+        ln -s $(pwd)/ghostty ~/Library/Application\ Support/com.mitchellh.ghostty/config
+    fi
+
 }
 
 link_dotfiles() { 
@@ -106,8 +134,8 @@ link_dotfiles() {
     fi
 
     # Create my work alias's file if it does not exists
-    if [ ! -f ~/work_alias ]; then
-        touch ~/work_alias
+    if [ ! -f ~/.work_alias ]; then
+        touch ~/.work_alias
     fi
 
     # Link the nvim configuration
@@ -158,6 +186,8 @@ apply_mac_default() {
 if [ ${machine} == Mac ]; then
     install_zsh
     link_dotfiles
+    #install_brew
+    install_ghostty
     #apply_mac_default
  fi
 
