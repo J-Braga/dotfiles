@@ -180,18 +180,18 @@ apply_mac_default() {
 
     defaults write com.apple.finder _FXSortFoldersFirst -bool true
     killall Finder
+
+    defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+    defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 }
 
 
 if [ ${machine} == Mac ]; then
     install_zsh
     link_dotfiles
-    #install_brew
+    install_brew
     install_ghostty
-    #apply_mac_default
+    apply_mac_default
  fi
 
-#install_tmux
-#install_lsp_on_mac
-#install_nvim
 
