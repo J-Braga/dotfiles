@@ -4,47 +4,83 @@ return {
         dependencies = { "rcarriga/nvim-dap-ui" }, -- For UI integration
         config = function()
             local dap = require("dap")
-            --vim.fn.sign_define("DapBreakpoint", { text = "•", texthl = "red", linehl = "", numhl = "" })
 
-            --vim.api.nvim_set_hl(0, "SignColumn", { bg = "#1E1E1E", ctermbg = 235 })  -- Dark gray background
-            --vim.highlight.create('DapBreakpoint', { ctermbg=0, guifg='#993939', guibg='#31353f' }, false)
-            --vim.highlight.create('DapLogPoint', { ctermbg=0, guifg='#61afef', guibg='#31353f' }, false)
-            --vim.highlight.create('DapStopped', { ctermbg=0, guifg='#98c379', guibg='#31353f' }, false)
+            local mason_path = vim.fn.stdpath("data") .. "/mason" -- Standard, dynamic way to get Mason root
+            local codelldb_pkg = mason_path .. "/packages/codelldb"
+            local extension_path = codelldb_pkg .. "/extension/"
+            local codelldb_path = extension_path .. "adapter/codelldb"
+            local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib" -- Adjust for your OS (e.g., .dylib on macOS, .dll on Windows)
 
-            --vim.api.nvim_set_hl(0, "blue",   { fg = "#3d59a1" }) 
-            --vim.api.nvim_set_hl(0, "green",  { fg = "#9ece6a" }) 
-            --vim.api.nvim_set_hl(0, "yellow", { fg = "#FFFF00" }) 
-            --vim.api.nvim_set_hl(0, "orange", { fg = "#f09000" }) 
+            dap.adapters.codelldb = {
+                type = "server",
+                port = "${port}",
+                executable = {
+                    command = codelldb_path,
+                    args = { "--liblldb", liblldb_path, "--port", "${port}" },
+                },
+            }
+            -- Zig configurations with auto-build
+            dap.configurations.zig = {
+                {
+                    name = "Build and Launch Zig Executable",
+                    type = "codelldb",
+                    request = "launch",
+                    --program = "${workspaceFolder}/zig-out/bin/${workspaceFolderBasename}", -- Assumes default Zig build output; adjust if custom
+                    program = function()
+                        local cwd = vim.fn.getcwd()
+                        local basename = vim.fn.fnamemodify(cwd, ":t"):gsub("-", "_") -- Replace hyphens with underscores
+                        if vim.fn.filereadable(cwd .. "/build.zig") == 1 then
+                            return cwd .. "/zig-out/bin/" .. basename
+                        else
+                            return vim.fn.expand("%:r"):gsub("-", "_") -- For single files: file without extension, with replacement
+                        end
+                    end,
+                    cwd = "${workspaceFolder}",
+                    stopOnEntry = false,
+                    args = {},
+                    preLaunchTask = function()
+                        local build_cmd = "zig build" -- Or "zig build-exe yourfile.zig -O Debug" for single files
+                        vim.fn.system(build_cmd) -- Run build; check exit code if needed for errors
+                        -- Optional: Notify on failure
+                        if vim.v.shell_error ~= 0 then
+                            vim.notify("Zig build failed!", vim.log.levels.ERROR)
+                        end
+                    end,
+                },
+                --{
+                --    name = "Build and Debug Zig Test",
+                --    type = "codelldb",
+                --    request = "launch",
+                --    program = "${workspaceFolder}/zig-out/bin/${workspaceFolderBasename}-test", -- Assumes zig test output
+                --    cwd = "${workspaceFolder}",
+                --    args = { "--test-filter", vim.fn.input("Test filter (optional): ") },
+                --    preLaunchTask = function()
+                --        local test_build_cmd = "zig build test" -- Builds tests with debug symbols
+                --        vim.fn.system(test_build_cmd)
+                --        if vim.v.shell_error ~= 0 then
+                --            vim.notify("Zig test build failed!", vim.log.levels.ERROR)
+                --        end
+                --    end,
+                --},
+            }
 
-            vim.api.nvim_set_hl(0, 'DapBreakpoint', { ctermbg = 0, bg = '#993939'})
-            vim.api.nvim_set_hl(0, 'DapLogPoint', { ctermbg = 0, bg = '#61afef' })
-            vim.api.nvim_set_hl(0, 'DapStopped', { ctermbg = 0, bg = '#98c379' })
+            vim.api.nvim_set_hl(0, "DapBreakpoint", { ctermbg = 0, bg = "#993939" })
+            vim.api.nvim_set_hl(0, "DapLogPoint", { ctermbg = 0, bg = "#61afef" })
+            vim.api.nvim_set_hl(0, "DapStopped", { ctermbg = 0, bg = "#98c379" })
 
-            -- Define signs with text (ASCII), highlights, and priority
-            vim.fn.sign_define("DapBreakpoint", {
-              text = "🛑", --"B>",  -- Visible ASCII text
-              texthl = "DapBreakpoint",
-              linehl = "DapBreakpoint",
-              numhl = "",
-              priority = 100,
-            })
-            vim.fn.sign_define("DapBreakpointRejected", {
-              text = "🚫",
-              texthl = "DapBreakpointRejected",
-              linehl = "",
-              numhl = "",
-              priority = 100,
-            })
-            vim.fn.sign_define("DapStopped", {
-              text = "->",
-              texthl = "DapStopped",
-              linehl = "Visual",
-              numhl = "DapStopped",
-              priority = 100,
-            })
+            vim.fn.sign_define(
+                "DapBreakpoint",
+                { text = "🛑", texthl = "DapBreakpoint", linehl = "DapBreakpoint", numhl = "", priority = 100 }
+            )
+            vim.fn.sign_define(
+                "DapBreakpointRejected",
+                { text = "🚫", texthl = "DapBreakpointRejected", linehl = "", numhl = "", priority = 100 }
+            )
+            vim.fn.sign_define(
+                "DapStopped",
+                { text = "->", texthl = "DapStopped", linehl = "Visual", numhl = "DapStopped", priority = 100 }
+            )
 
-
-            -- Basic keymaps for debugging
             vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "Toggle Breakpoint" })
             vim.keymap.set("n", "<leader>dc", dap.continue, { desc = "Continue/Start Debugging" })
             vim.keymap.set("n", "<leader>do", dap.step_over, { desc = "Step Over" })

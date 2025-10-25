@@ -3,6 +3,8 @@ return {
     dependencies = {
         "williamboman/mason-lspconfig.nvim",
         "WhoIsSethDaniel/mason-tool-installer.nvim",
+        "mfussenegger/nvim-dap",
+        "jay-babu/mason-nvim-dap.nvim",
     },
     config = function()
         -- import mason
@@ -39,6 +41,9 @@ return {
                 "pylint",
                 "eslint_d",
             },
+        })
+        require("mason-nvim-dap").setup({
+            ensure_installed = { "codelldb" },
         })
     end,
 }
