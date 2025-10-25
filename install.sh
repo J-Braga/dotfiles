@@ -144,9 +144,9 @@ link_dotfiles() {
     fi
 
     # Link my alacritty's if it does not exists
-    if [ ! -f ~/.alacritty.toml ]; then
-        ln -s $(pwd)alacritty.toml ~/.alacritty.toml
-    fi
+    #if [ ! -f ~/.alacritty.toml ]; then
+    #    ln -s $(pwd)alacritty.toml ~/.alacritty.toml
+    #fi
 
     # Link my tmux's if it does not exists
     #if [ ! -f ~/.tmux.conf ]; then

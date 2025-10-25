@@ -48,10 +48,10 @@ keymap("n", "<leader>h", ":set hlsearch!<CR>", opts)
 -- keymap("n", "<leader>gs", "<cmd>Telescope git_status<cr>", opts) -- list current changes per file with diff preview ["gs" for git status]
 
 -- Resize with arrows
-keymap("n", "<C-Up>", ":resize -2<CR>", opts)
-keymap("n", "<C-Down>", ":resize +2<CR>", opts)
-keymap("n", "<C-Left>", ":vertical resize -2<CR>", opts)
-keymap("n", "<C-Right>", ":vertical resize +2<CR>", opts)
+keymap("n", "<S-Up>", ":resize -2<CR>", opts)
+keymap("n", "<S-Down>", ":resize +2<CR>", opts)
+keymap("n", "<S-Left>", ":vertical resize -2<CR>", opts)
+keymap("n", "<S-Right>", ":vertical resize +2<CR>", opts)
 
 -- Code runner
 keymap("n", "<leader>r", "", opts)
@@ -135,3 +135,5 @@ keymap("t", "<C-j>", [[<Cmd>wincmd j<CR>]], term_opts)
 keymap("t", "<C-k>", [[<Cmd>wincmd k<CR>]], term_opts)
 keymap("t", "<C-l>", [[<Cmd>wincmd l<CR>]], term_opts)
 keymap("t", "<C-w>", [[<C-\><C-n><C-w>]], term_opts)
+
+vim.keymap.set("n", "<leader>rp", ":!python %<CR>", { desc = "Run Python File" })

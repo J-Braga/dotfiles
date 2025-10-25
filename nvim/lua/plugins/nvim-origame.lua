@@ -49,9 +49,13 @@ return {
             end,
         })
 
-        vim.opt.statuscolumn = "%!v:lua.StatusCol()"
+        --vim.opt.statuscolumn = "%!v:lua.StatusCol()"
+        --function _G.StatusCol()
+        --    return fold_util.statuscol()
+        --end
+        --vim.opt.statuscolumn = "%!v:lua.StatusCol()"
         function _G.StatusCol()
-            return fold_util.statuscol()
+            return "%s" .. fold_util.statuscol()
         end
     end,
 }

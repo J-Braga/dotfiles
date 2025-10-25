@@ -9,6 +9,7 @@ if not vim.loop.fs_stat(lazypath) then
         lazypath,
     })
 end
+
 vim.opt.rtp:prepend(lazypath)
 
 require("configs")
@@ -66,5 +67,6 @@ require("lazy").setup({
     },
 })
 --vim.notify = require("notify")
-require("custom.rename")
-require("custom.zig_build")
+--require("custom.rename")
+--require("custom.zig_build")
+vim.api.nvim_set_hl(0, "Whitespace", { fg = "#2A99F2" }) -- Blue foreground, dark gray background

@@ -13,7 +13,13 @@ opt.tabstop = 4 -- 2 spaces for tabs (prettier default)
 opt.shiftwidth = 2 -- 2 spaces for indent width
 opt.expandtab = true -- expand tab to spaces
 opt.autoindent = true -- copy indent from current line when starting new one
-
+opt.list = true
+opt.listchars = {
+    lead = "·", -- Middle dot for every space (including leading whitespace)
+    trail = "·", -- Same dot for trailing spaces
+    tab = "▸ ", -- Optional: Arrow + space for tabs
+    eol = "¬", -- Optional: Symbol for end-of-line
+}
 opt.wrap = false
 
 -- search settings
@@ -25,8 +31,9 @@ opt.cursorline = true
 -- turn on termguicolors for tokyonight colorscheme to work
 -- (have to use iterm2 or any other true color terminal)
 opt.termguicolors = true
-opt.background = "dark" -- colorschemes that can be light or dark will be made dark
+--opt.background = "dark" -- colorschemes that can be light or dark will be made dark
 opt.signcolumn = "yes" -- show sign column so that text doesn't shift
+--opt.signcolumn = "auto:3"
 
 -- backspace
 opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or insert mode start position
@@ -43,4 +50,3 @@ opt.splitbelow = true -- split horizontal window to the bottom
 
 -- turn off swapfile
 opt.swapfile = false
-
