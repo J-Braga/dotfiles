@@ -143,6 +143,9 @@ if [ -d ~/.bin/zig ]; then
   export PATH=$PATH:~/.bin/zig
 fi
 
+if [ -f ~/.work_zshrc ]; then
+  source ~/.work_zshrc
+fi
 
 export PATH=$PATH:/usr/local/sbin
 #export NVIM_LISTEN_ADDRESS='/tmp/nvimsocket nvim'

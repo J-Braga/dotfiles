@@ -31,6 +31,7 @@ alias cv="python3 -m virtualenv venv"
 alias python="python3"
 alias prod="git checkout production && git pull"
 alias nbr="prod && git checkout -b "
+alias lg="lazygit"
 alias vim=nvim
 
 
