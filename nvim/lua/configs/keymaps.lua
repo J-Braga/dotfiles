@@ -25,27 +25,8 @@ keymap("n", "<leader>sx", ":close<CR>", opts)
 -- Buffer
 keymap("n", "<leader>bd", ":bd<CR>", opts)
 
--- Plugin Keybinds
--- keymap("n", "<leader>m", ":MaximizerToggle<CR>", opts)
-
 -- no hl
 keymap("n", "<leader>h", ":set hlsearch!<CR>", opts)
-
--- explorer
--- keymap("n", "<leader>e", ":NvimTreeToggle<CR>", opts)
-
--- telescope
--- keymap("n", "<leader>fs", "<cmd>Telescope live_grep<cr>", opts) -- find string in current working directory as you type
--- keymap("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", opts) -- find string under cursor in current working directory
--- keymap("n", "<leader>fb", "<cmd>Telescope buffers<cr>", opts) -- list open buffers in current neovim instance
--- keymap("n", "<leader>fh", "<cmd>Telescope help_tags<cr>", opts) -- list available help tags
--- keymap("n", "gD", "<cmd>Telescope lsp_references<cr>", opts) -- list available help tags
-
--- telescope git commands (not on youtube nvim video)
--- keymap("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", opts) -- list all git commits (use <cr> to checkout) ["gc" for git commits]
--- keymap("n", "<leader>gfc", "<cmd>Telescope git_bcommits<cr>", opts) -- list git commits for current file/buffer (use <cr> to checkout) ["gfc" for git file commits]
--- keymap("n", "<leader>gb", "<cmd>Telescope git_branches<cr>", opts) -- list git branches (use <cr> to checkout) ["gb" for git branch]
--- keymap("n", "<leader>gs", "<cmd>Telescope git_status<cr>", opts) -- list current changes per file with diff preview ["gs" for git status]
 
 -- Resize with arrows
 keymap("n", "<S-Up>", ":resize -2<CR>", opts)
@@ -79,9 +60,6 @@ keymap("i", ".", ".<C-g>u", opts)
 keymap("i", "!", "!<C-g>u", opts)
 keymap("i", ":", ":<C-g>u", opts)
 keymap("i", "?", "?<C-g>u", opts)
-
--- Debugger
---keymap('n', '<leader>br', ":lua require'dap'.toggle_breakpoint()", opts)
 
 -- Navigate buffers
 keymap("n", "<S-l>", ":bnext<CR>", opts)

@@ -53,6 +53,6 @@ opt.swapfile = false
 
 vim.filetype.add({
     extension = {
-        j2 = "jinaj",
+        j2 = "jinja",
     },
 })

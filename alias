@@ -29,8 +29,6 @@ alias xclip='xclip -selection c'
 alias av="source venv/bin/activate"
 alias cv="python3 -m virtualenv venv"
 alias python="python3"
-alias prod="git checkout production && git pull"
-alias nbr="prod && git checkout -b "
 alias lg="lazygit"
 alias vim=nvim
 
@@ -92,7 +90,6 @@ alias cpu_hogs='ps wwaxr -o pid,stat,%cpu,time,command | head -10'
 #   ------------------------------------------------------------
 alias ttop="top -R -F -s 10 -o rsize"
 
-
 #   ---------------------------
 #   6. NETWORKING
 #   ---------------------------
@@ -106,4 +103,3 @@ alias ipInfo0='ipconfig getpacket en0'              # ipInfo0:      Get info on 
 alias ipInfo1='ipconfig getpacket en1'              # ipInfo1:      Get info on connections for en1
 alias openPorts='sudo lsof -i | grep LISTEN'        # openPorts:    All listening connections
 alias showBlocked='sudo ipfw list'                  # showBlocked:  All ipfw rules inc/ blocked IPs
-
