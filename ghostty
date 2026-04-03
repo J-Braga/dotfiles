@@ -1,3 +1,4 @@
-font-family = "Mononoki Nerd Font Mono"
+#font-family = "Grok Variable"
 font-size = 16
 window-padding-x = 6
+keybind = shift+enter=text:\x1b\r

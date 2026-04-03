@@ -6,7 +6,7 @@ check_pre_commit() {
     if [ "$current_dir" = "$repo_path" ]; then
         if [ ! -f ".git/hooks/pre-commit" ]; then
             # Copy the pre-commit hook from ~/work/hooks/pre-commits
-            if [ -f "~/work/hooks/pre-commits" ]; then
+            if [ -f "$HOME/work/hooks/pre-commits" ]; then
                 cp ~/work/hooks/pre-commits .git/hooks/pre-commit
                 chmod +x .git/hooks/pre-commit
             else
@@ -49,11 +49,7 @@ ZSH_THEME=bira
 HIST_STAMPS="mm/dd/yyyy"
 
 #Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='nvim'
-else
-  export EDITOR='nvim'
-fi
+export EDITOR='nvim'
 
 # Add my alias that is in git
 if [ -f ~/.config/alias ]; then
@@ -67,11 +63,17 @@ fi
 
 zstyle :omz:plugins:ssh-agent identities id_rsa 
 
+# vi mode - must be before sourcing oh-my-zsh so zsh-autocomplete detects viins keymap
+bindkey -v
+export KEYTIMEOUT=1
+
+# Suggest from history first, then fall back to completion engine (for filenames, etc.)
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+
 plugins=(
   git
   macos
   zsh-autosuggestions
-  zsh-syntax-highlighting
   fast-syntax-highlighting
   zsh-autocomplete
   ssh-agent
@@ -82,9 +84,16 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-# vi mode
-bindkey -v
-export KEYTIMEOUT=1
+# Restore arrow keys for history navigation (override zsh-autocomplete)
+# Uses dotted versions per zsh-autocomplete docs to bypass its wrappers
+bindkey '^[[A' .up-line-or-history
+bindkey '^[OA' .up-line-or-history
+bindkey '^[[B' .down-line-or-history
+bindkey '^[OB' .down-line-or-history
+bindkey -a '^[[A' .up-line-or-history
+bindkey -a '^[OA' .up-line-or-history
+bindkey -a '^[[B' .down-line-or-history
+bindkey -a '^[OB' .down-line-or-history
 
 # Use vim keys in tab complete menu:
 bindkey -M menuselect 'h' vi-backward-char
@@ -122,7 +131,7 @@ preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
 # CTRL+SPACE to access autosuggest
 bindkey '^ ' autosuggest-accept
 
-autoload -U +X bashcompinit && bashcompinit -U
+autoload -U +X bashcompinit && bashcompinit
 
 if [ -d ~/.config/linters/ ]; then
   export PATH=$PATH:~/.config/linters/
@@ -157,5 +166,5 @@ export PATH=$PATH:/usr/local/sbin
 #export BUN_INSTALL="$HOME/.bun"
 #export PATH="$BUN_INSTALL/bin:$PATH"
 
-export PATH="$PATH:~/.local/bin"
+export PATH="$PATH:$HOME/.local/bin"
 

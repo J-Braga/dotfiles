@@ -62,11 +62,11 @@ return {
 				--keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
 				keymap.set("n", "gd", vim.lsp.buf.definition, opts)
 
-				opts.desc = "Show LSP implementations"
-				keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
+			opts.desc = "Show LSP implementations"
+			keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
 
-				opts.desc = "Show LSP type definitions"
-				keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
+			opts.desc = "Show LSP type definitions"
+			keymap.set("n", "gt", vim.lsp.buf.type_definition, opts)
 
 				opts.desc = "See available code actions"
 				keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
@@ -74,8 +74,10 @@ return {
 				opts.desc = "Smart rename"
 				keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
 
-				opts.desc = "Show buffer diagnostics"
-				keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts)
+			opts.desc = "Show buffer diagnostics"
+			keymap.set("n", "<leader>D", function()
+				vim.diagnostic.setloclist({ open = true })
+			end, opts)
 
 				opts.desc = "Show line diagnostics"
 				keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
