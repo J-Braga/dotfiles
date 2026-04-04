@@ -84,6 +84,47 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+
+zstyle ':completion:*' list-colors 'di=34' 'ln=36' 'so=35' 'pi=33' 'ex=32' 'bd=34;46' 'cd=34;46' 'su=30;41' 'sg=30;46' 'tw=30;42' 'ow=30;43'
+
+if (( ${+FAST_HIGHLIGHT_STYLES} )); then
+  FAST_HIGHLIGHT_STYLES[default]='none'
+  FAST_HIGHLIGHT_STYLES[unknown-token]='fg=1,bold'
+  FAST_HIGHLIGHT_STYLES[reserved-word]='fg=15'
+  FAST_HIGHLIGHT_STYLES[alias]='fg=2'
+  FAST_HIGHLIGHT_STYLES[builtin]='fg=2'
+  FAST_HIGHLIGHT_STYLES[function]='fg=15'
+  FAST_HIGHLIGHT_STYLES[command]='fg=2'
+  FAST_HIGHLIGHT_STYLES[precommand]='fg=2'
+  FAST_HIGHLIGHT_STYLES[subcommand]='fg=11'
+  FAST_HIGHLIGHT_STYLES[single-hyphen-option]='fg=4'
+  FAST_HIGHLIGHT_STYLES[double-hyphen-option]='fg=4'
+  FAST_HIGHLIGHT_STYLES[path]='fg=6'
+  FAST_HIGHLIGHT_STYLES[path-to-dir]='fg=6,underline'
+  FAST_HIGHLIGHT_STYLES[path_pathseparator]='fg=8'
+  FAST_HIGHLIGHT_STYLES[single-quoted-argument]='fg=14'
+  FAST_HIGHLIGHT_STYLES[double-quoted-argument]='fg=14'
+  FAST_HIGHLIGHT_STYLES[back-dollar-quoted-argument]='fg=14'
+  FAST_HIGHLIGHT_STYLES[back-or-dollar-double-quoted-argument]='fg=14'
+  FAST_HIGHLIGHT_STYLES[dollar-quoted-argument]='fg=14'
+  FAST_HIGHLIGHT_STYLES[comment]='fg=2'
+  FAST_HIGHLIGHT_STYLES[variable]='fg=4'
+  FAST_HIGHLIGHT_STYLES[assign]='fg=15'
+  FAST_HIGHLIGHT_STYLES[redirection]='fg=11'
+  FAST_HIGHLIGHT_STYLES[globbing]='fg=4,bold'
+  FAST_HIGHLIGHT_STYLES[history-expansion]='fg=11,bold'
+  FAST_HIGHLIGHT_STYLES[mathnum]='fg=6'
+  FAST_HIGHLIGHT_STYLES[correct-subtle]='fg=8'
+  FAST_HIGHLIGHT_STYLES[incorrect-subtle]='fg=1'
+  FAST_HIGHLIGHT_STYLES[bracket-level-1]='fg=6,bold'
+  FAST_HIGHLIGHT_STYLES[bracket-level-2]='fg=11,bold'
+  FAST_HIGHLIGHT_STYLES[bracket-level-3]='fg=4,bold'
+  FAST_HIGHLIGHT_STYLES[here-string-text]='bg=18'
+  FAST_HIGHLIGHT_STYLES[here-string-var]='fg=14,bg=18'
+  FAST_HIGHLIGHT_STYLES[subtle-bg]='bg=18'
+fi
+
 # Restore arrow keys for history navigation (override zsh-autocomplete)
 # Uses dotted versions per zsh-autocomplete docs to bypass its wrappers
 bindkey '^[[A' .up-line-or-history
@@ -167,4 +208,3 @@ export PATH=$PATH:/usr/local/sbin
 #export PATH="$BUN_INSTALL/bin:$PATH"
 
 export PATH="$PATH:$HOME/.local/bin"
-
