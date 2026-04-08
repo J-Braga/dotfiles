@@ -208,3 +208,4 @@ export PATH=$PATH:/usr/local/sbin
 #export PATH="$BUN_INSTALL/bin:$PATH"
 
 export PATH="$PATH:$HOME/.local/bin"
+[ -f ~/.config/forgejo/token.env ] && source ~/.config/forgejo/token.env
