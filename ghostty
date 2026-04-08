@@ -1,6 +1,8 @@
 #font-family = "Grok Variable"
 font-family = "Consolas"
 font-size = 17
+font-thicken = true
+font-thicken-strength = 40
 window-padding-x = 6
 keybind = shift+enter=text:\x1b\r
 background = #072626
@@ -11,17 +13,17 @@ selection-background = #0000ff
 selection-foreground = #d3b58d
 palette = 0=#072626
 palette = 1=#e05a47
-palette = 2=#2fae1b
-palette = 3=#c7a538
-palette = 4=#6fc2ff
+palette = 2=#78a65a
+palette = 3=#b89a5a
+palette = 4=#7aa9c7
 palette = 5=#cdb792
-palette = 6=#45d6ff
+palette = 6=#69b8c8
 palette = 7=#d3b58d
 palette = 8=#9d8d6e
 palette = 9=#ff7a63
-palette = 10=#44c928
-palette = 11=#e2be63
-palette = 12=#8fd4ff
+palette = 10=#8fbc67
+palette = 11=#d0b06a
+palette = 12=#93bdd8
 palette = 13=#e0c89f
-palette = 14=#0fdfaf
+palette = 14=#78c6b4
 palette = 15=#f7e7ce
