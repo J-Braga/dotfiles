@@ -17,21 +17,35 @@ case "${unameOut}" in
     *)          machine="UNKNOWN:${unameOut}";;
 esac
 
+# Install a brew formula/cask only if it isn't already present.
+# Usage: brew_install <name> [extra brew args...]
+brew_install() {
+    local pkg="$1"; shift
+    if brew list "$pkg" >/dev/null 2>&1; then
+        echo "  $pkg already installed, skipping"
+    else
+        brew install "$@" "$pkg"
+    fi
+}
+
 install_brew() {
     if ! which brew >/dev/null 2>&1; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
 
-    brew install --cask font-mononoki-nerd-font
+    brew_install font-mononoki-nerd-font --cask
+    brew_install neovim --HEAD   # neovim nightly
+    brew_install zig
+    brew_install lazygit
+    brew_install uv
+    brew_install stylua
+    brew_install tmux
 
-    # Neovim nightly
-    brew install --HEAD neovim
-
-    brew install zig
-    brew install lazygit
-    brew install uv
-    brew install stylua
-    brew install tmux
+    # virtualenvwrapper.sh must be on PATH for the oh-my-zsh virtualenvwrapper
+    # plugin (see plugins=() in zshrc). uv symlinks it into ~/.local/bin.
+    if ! uv tool list 2>/dev/null | grep -q '^virtualenvwrapper'; then
+        uv tool install virtualenvwrapper
+    fi
 }
 
 install_zsh() {
