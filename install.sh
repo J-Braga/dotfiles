@@ -75,35 +75,20 @@ install_ghostty() {
 }
 
 link_dotfiles() {
-    if [ ! -f ~/.zshrc ]; then
-        # Link new zsh file
-        ln -s "$DOTFILES/zshrc" ~/.zshrc
-    fi
+    # ln -sfn: force-overwrite stale/broken links and don't follow an existing
+    # symlinked dir. Idempotent, so re-running always repairs links.
+    mkdir -p ~/.config/alacritty
 
-    # Link my alias's if it does not exists
-    if [ ! -f ~/.config/alias ]; then
-        ln -s "$DOTFILES/alias" ~/.config/alias
-    fi
+    ln -sfn "$DOTFILES/zshrc" ~/.zshrc
+    ln -sfn "$DOTFILES/alias" ~/.config/alias
+    ln -sfn "$DOTFILES/nvim" ~/.config/nvim
+    ln -sfn "$DOTFILES/alacritty.yml" ~/.config/alacritty/alacritty.yml
+    ln -sfn "$DOTFILES/tmux.conf" ~/.tmux.conf
 
-    # Create my work alias's file if it does not exists
-    if [ ! -f ~/.work_alias ]; then
+    # Create my work alias file if it does not exist (never clobber it — it
+    # holds machine-specific aliases, not a symlink into the repo).
+    if [ ! -e ~/.work_alias ]; then
         touch ~/.work_alias
-    fi
-
-    # Link the nvim configuration
-    if [ ! -d ~/.config/nvim ]; then
-        ln -s "$DOTFILES/nvim" ~/.config/nvim
-    fi
-
-    # Link my alacritty config if it does not exist
-    if [ ! -f ~/.config/alacritty/alacritty.yml ]; then
-        mkdir -p ~/.config/alacritty
-        ln -s "$DOTFILES/alacritty.yml" ~/.config/alacritty/alacritty.yml
-    fi
-
-    # Link my tmux config if it does not exist
-    if [ ! -f ~/.tmux.conf ]; then
-        ln -s "$DOTFILES/tmux.conf" ~/.tmux.conf
     fi
 }
 
@@ -120,9 +105,9 @@ apply_mac_default() {
 }
 
 if [ "${machine}" = "Mac" ]; then
+    link_dotfiles
     install_zsh
     install_brew
-    link_dotfiles
     install_ghostty
     apply_mac_default
 fi
