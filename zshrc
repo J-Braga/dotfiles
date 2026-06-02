@@ -70,6 +70,13 @@ export KEYTIMEOUT=1
 # Suggest from history first, then fall back to completion engine (for filenames, etc.)
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
+# virtualenvwrapper is installed via `uv tool install` (see install.sh), which
+# isolates its module in its own venv. Point the omz plugin at that interpreter
+# so it can import the module. Guarded so a machine without it stays quiet.
+if [ -x "$HOME/.local/share/uv/tools/virtualenvwrapper/bin/python" ]; then
+  export VIRTUALENVWRAPPER_PYTHON="$HOME/.local/share/uv/tools/virtualenvwrapper/bin/python"
+fi
+
 plugins=(
   git
   macos
@@ -209,3 +216,4 @@ export PATH=$PATH:/usr/local/sbin
 
 export PATH="$PATH:$HOME/.local/bin"
 [ -f ~/.config/forgejo/token.env ] && source ~/.config/forgejo/token.env
+
