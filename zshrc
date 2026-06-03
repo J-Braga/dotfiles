@@ -151,23 +151,29 @@ bindkey -M menuselect 'j' vi-down-line-or-history
 bindkey -v '^?' backward-delete-char
 bindkey "^A" vi-beginning-of-line
 # Change cursor shape for different vi modes.
-function zle-keymap-select {
-  if [[ ${KEYMAP} == vicmd ]] ||
-     [[ $1 = 'block' ]]; then
-    echo -ne '\e[1 q'
-  elif [[ ${KEYMAP} == main ]] ||
-       [[ ${KEYMAP} == viins ]] ||
-       [[ ${KEYMAP} = '' ]] ||
-       [[ $1 = 'beam' ]]; then
-    echo -ne '\e[5 q'
+#
+# NOTE: use add-zle-hook-widget, NOT `zle -N zle-line-init`/`zle -N
+# zle-keymap-select`. zsh-autocomplete installs its OWN zle-line-init widget to
+# set up its async file descriptor; replacing it with `zle -N` destroys that
+# setup, which is what caused ".autocomplete:async:wait ... /dev/fd/-1: bad file
+# descriptor" on startup (see zsh-autocomplete issue #294 — the known vi-mode
+# interaction). add-zle-hook-widget chains our handler so both run.
+autoload -Uz add-zle-hook-widget
+
+_cursor_keymap_select() {
+  if [[ ${KEYMAP} == vicmd ]] || [[ $1 = 'block' ]]; then
+    echo -ne '\e[1 q'   # block cursor for command mode
+  else
+    echo -ne '\e[5 q'   # beam cursor for insert mode
   fi
 }
-zle -N zle-keymap-select
-zle-line-init() {
-    zle -K viins # initiate `vi insert` as keymap (can be removed if `bindkey -V` has been set elsewhere)
-    echo -ne "\e[5 q"
+add-zle-hook-widget keymap-select _cursor_keymap_select
+
+_cursor_line_init() {
+  echo -ne '\e[5 q'     # beam cursor when a new line starts
 }
-zle -N zle-line-init
+add-zle-hook-widget line-init _cursor_line_init
+
 echo -ne '\e[5 q' # Use beam shape cursor on startup.
 preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
 # Edit line in vim with ctrl-e:
@@ -217,3 +223,10 @@ export PATH=$PATH:/usr/local/sbin
 export PATH="$PATH:$HOME/.local/bin"
 [ -f ~/.config/forgejo/token.env ] && source ~/.config/forgejo/token.env
 
+
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export PATH="$PATH:$ANDROID_HOME/platform-tools"
+
+export ANDROID_HOME="/opt/homebrew/share/android-commandlinetools"
+export NDK_HOME="$ANDROID_HOME/ndk/27.2.12479018"
+export PATH="$PATH:$ANDROID_HOME/platform-tools"
