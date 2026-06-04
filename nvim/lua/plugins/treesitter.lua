@@ -5,13 +5,16 @@ return {
     dependencies = {
         "windwp/nvim-ts-autotag",
     },
-    lazy = false,
     config = function()
         -- import nvim-treesitter plugin
         local treesitter = require("nvim-treesitter.configs")
+        local parser_install_dir = vim.fn.stdpath("data") .. "/treesitter"
+
+        vim.opt.runtimepath:prepend(parser_install_dir)
 
         -- configure treesitter
         treesitter.setup({ -- enable syntax highlighting
+            parser_install_dir = parser_install_dir,
             highlight = {
                 enable = true,
                 --disable = {},

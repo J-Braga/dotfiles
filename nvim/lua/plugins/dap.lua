@@ -1,7 +1,9 @@
 return {
     {
+        "nvim-neotest/nvim-nio",
+    },
+    {
         "mfussenegger/nvim-dap",
-        dependencies = { "rcarriga/nvim-dap-ui" }, -- For UI integration
         config = function()
             local dap = require("dap")
 
@@ -129,8 +131,18 @@ return {
     },
     {
         "rcarriga/nvim-dap-ui",
-        dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
+        keys = {
+            {
+                "<leader>du",
+                function()
+                    require("dapui").toggle()
+                end,
+                desc = "Toggle DAP UI",
+            },
+        },
+        dependencies = { "nvim-neotest/nvim-nio", "mfussenegger/nvim-dap" },
         config = function()
+            require("lazy").load({ plugins = { "nvim-nio" } })
             local dap, dapui = require("dap"), require("dapui")
             dapui.setup() -- Default setup; customize options as needed (see :help dapui.setup)
 
@@ -147,9 +159,6 @@ return {
             dap.listeners.before.event_exited.dapui_config = function()
                 dapui.close()
             end
-
-            -- Optional: Keymaps for UI elements
-            vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "Toggle DAP UI" })
         end,
     },
 }

@@ -61,14 +61,12 @@ if [ -f ~/.work_alias ]; then
     source ~/.work_alias
 fi
 
-zstyle :omz:plugins:ssh-agent identities id_rsa 
-
 # vi mode - must be before sourcing oh-my-zsh so zsh-autocomplete detects viins keymap
 bindkey -v
 export KEYTIMEOUT=1
 
-# Suggest from history first, then fall back to completion engine (for filenames, etc.)
-ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+# Suggest from history only; completion suggestions spawn helper zsh workers.
+ZSH_AUTOSUGGEST_STRATEGY=(history)
 
 # virtualenvwrapper is installed via `uv tool install` (see install.sh), which
 # isolates its module in its own venv. Point the omz plugin at that interpreter
@@ -83,7 +81,6 @@ plugins=(
   zsh-autosuggestions
   fast-syntax-highlighting
   zsh-autocomplete
-  ssh-agent
   virtualenvwrapper
   azure
   aws

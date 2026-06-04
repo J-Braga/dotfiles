@@ -119,9 +119,9 @@ apply_mac_default() {
 }
 
 if [ "${machine}" = "Mac" ]; then
-    link_dotfiles
-    install_zsh
     install_brew
+    install_zsh
     install_ghostty
+    link_dotfiles
     apply_mac_default
 fi
