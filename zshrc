@@ -61,7 +61,7 @@ if [ -f ~/.work_alias ]; then
     source ~/.work_alias
 fi
 
-# vi mode - must be before sourcing oh-my-zsh so zsh-autocomplete detects viins keymap
+# vi mode
 bindkey -v
 export KEYTIMEOUT=1
 
@@ -80,7 +80,6 @@ plugins=(
   macos
   zsh-autosuggestions
   fast-syntax-highlighting
-  zsh-autocomplete
   virtualenvwrapper
   azure
   aws
@@ -129,8 +128,7 @@ if (( ${+FAST_HIGHLIGHT_STYLES} )); then
   FAST_HIGHLIGHT_STYLES[subtle-bg]='bg=18'
 fi
 
-# Restore arrow keys for history navigation (override zsh-autocomplete)
-# Uses dotted versions per zsh-autocomplete docs to bypass its wrappers
+# Restore arrow keys for history navigation.
 bindkey '^[[A' .up-line-or-history
 bindkey '^[OA' .up-line-or-history
 bindkey '^[[B' .down-line-or-history
@@ -148,13 +146,6 @@ bindkey -M menuselect 'j' vi-down-line-or-history
 bindkey -v '^?' backward-delete-char
 bindkey "^A" vi-beginning-of-line
 # Change cursor shape for different vi modes.
-#
-# NOTE: use add-zle-hook-widget, NOT `zle -N zle-line-init`/`zle -N
-# zle-keymap-select`. zsh-autocomplete installs its OWN zle-line-init widget to
-# set up its async file descriptor; replacing it with `zle -N` destroys that
-# setup, which is what caused ".autocomplete:async:wait ... /dev/fd/-1: bad file
-# descriptor" on startup (see zsh-autocomplete issue #294 — the known vi-mode
-# interaction). add-zle-hook-widget chains our handler so both run.
 autoload -Uz add-zle-hook-widget
 
 _cursor_keymap_select() {

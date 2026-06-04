@@ -3,6 +3,35 @@ set -euo pipefail
 
 # Resolve the dotfiles repo dir so symlinks are stable regardless of CWD.
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REINSTALL=false
+
+usage() {
+    cat <<EOF
+Usage: ./install.sh [--reinstall]
+
+Options:
+  --reinstall   Remove managed dotfile links, shell/plugin state, and Neovim
+                generated state before running the normal install.
+  -h, --help    Show this help.
+EOF
+}
+
+for arg in "$@"; do
+    case "$arg" in
+        --reinstall)
+            REINSTALL=true
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $arg" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+done
 
 if [ ! -d ~/.config ]; then
     mkdir -p ~/.config
@@ -48,6 +77,22 @@ install_brew() {
     fi
 }
 
+reinstall_cleanup() {
+    echo "Removing managed dotfiles and generated shell/editor state..."
+
+    rm -f ~/.zshrc ~/.tmux.conf ~/.zcompdump*
+    rm -f ~/.config/alias ~/.config/alacritty/alacritty.yml
+    rm -rf ~/.config/nvim
+
+    rm -rf ~/.oh-my-zsh
+
+    rm -rf ~/.local/share/nvim
+    rm -rf ~/.local/state/nvim
+    rm -rf ~/.cache/nvim
+
+    rm -f "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
+}
+
 install_zsh() {
     # Clone zsh plugins
     if [ ! -d ~/.oh-my-zsh ]; then
@@ -72,20 +117,17 @@ install_zsh() {
         git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting"
     fi
 
-    #zsh-autocomplete plugin
-    if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autocomplete" ]; then
-        echo "installing zsh-autocomplete"
-        git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autocomplete"
-    fi
 }
 
 install_ghostty() {
     if ! which ghostty >/dev/null 2>&1; then
         echo "installing ghostty"
         brew install --cask ghostty
-        rm -f ~/Library/Application\ Support/com.mitchellh.ghostty/config
-        ln -s "$DOTFILES/ghostty" ~/Library/Application\ Support/com.mitchellh.ghostty/config
     fi
+
+    mkdir -p "$HOME/Library/Application Support/com.mitchellh.ghostty"
+    rm -rf "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
+    ln -sfn "$DOTFILES/ghostty" "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
 }
 
 link_dotfiles() {
@@ -119,6 +161,10 @@ apply_mac_default() {
 }
 
 if [ "${machine}" = "Mac" ]; then
+    if [ "$REINSTALL" = true ]; then
+        reinstall_cleanup
+    fi
+
     install_brew
     install_zsh
     install_ghostty
