@@ -18,7 +18,7 @@ EOF
 
 for arg in "$@"; do
     case "$arg" in
-        --reinstall)
+        --reinstall|-reinstall)
             REINSTALL=true
             ;;
         -h|--help)
@@ -57,9 +57,24 @@ brew_install() {
     fi
 }
 
+load_brew_env() {
+    if command -v brew >/dev/null 2>&1; then
+        return
+    fi
+
+    if [ -x /opt/homebrew/bin/brew ]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [ -x /usr/local/bin/brew ]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
+}
+
 install_brew() {
-    if ! which brew >/dev/null 2>&1; then
+    load_brew_env
+
+    if ! command -v brew >/dev/null 2>&1; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        load_brew_env
     fi
 
     brew_install font-mononoki-nerd-font --cask
@@ -81,7 +96,8 @@ reinstall_cleanup() {
     echo "Removing managed dotfiles and generated shell/editor state..."
 
     rm -f ~/.zshrc ~/.tmux.conf ~/.zcompdump*
-    rm -f ~/.config/alias ~/.config/alacritty/alacritty.yml
+    rm -rf ~/.config/alias
+    rm -rf ~/.config/alacritty
     rm -rf ~/.config/nvim
 
     rm -rf ~/.oh-my-zsh
@@ -96,7 +112,7 @@ reinstall_cleanup() {
 install_zsh() {
     # Clone zsh plugins
     if [ ! -d ~/.oh-my-zsh ]; then
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     fi
 
     #autosuggesions plugin
@@ -119,27 +135,31 @@ install_zsh() {
 
 }
 
+link_managed_path() {
+    local source="$1"
+    local target="$2"
+
+    mkdir -p "$(dirname "$target")"
+    rm -rf "$target"
+    ln -sfn "$source" "$target"
+    echo "linked $target -> $source"
+}
+
 install_ghostty() {
-    if ! which ghostty >/dev/null 2>&1; then
+    if ! command -v ghostty >/dev/null 2>&1; then
         echo "installing ghostty"
         brew install --cask ghostty
     fi
 
-    mkdir -p "$HOME/Library/Application Support/com.mitchellh.ghostty"
-    rm -rf "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
-    ln -sfn "$DOTFILES/ghostty" "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
+    link_managed_path "$DOTFILES/ghostty" "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
 }
 
 link_dotfiles() {
-    # ln -sfn: force-overwrite stale/broken links and don't follow an existing
-    # symlinked dir. Idempotent, so re-running always repairs links.
-    mkdir -p ~/.config/alacritty
-
-    ln -sfn "$DOTFILES/zshrc" ~/.zshrc
-    ln -sfn "$DOTFILES/alias" ~/.config/alias
-    ln -sfn "$DOTFILES/nvim" ~/.config/nvim
-    ln -sfn "$DOTFILES/alacritty.yml" ~/.config/alacritty/alacritty.yml
-    ln -sfn "$DOTFILES/tmux.conf" ~/.tmux.conf
+    link_managed_path "$DOTFILES/zshrc" "$HOME/.zshrc"
+    link_managed_path "$DOTFILES/alias" "$HOME/.config/alias"
+    link_managed_path "$DOTFILES/nvim" "$HOME/.config/nvim"
+    link_managed_path "$DOTFILES/alacritty.yml" "$HOME/.config/alacritty/alacritty.yml"
+    link_managed_path "$DOTFILES/tmux.conf" "$HOME/.tmux.conf"
 
     # Create my work alias file if it does not exist (never clobber it — it
     # holds machine-specific aliases, not a symlink into the repo).
@@ -165,6 +185,7 @@ if [ "${machine}" = "Mac" ]; then
         reinstall_cleanup
     fi
 
+    link_dotfiles
     install_brew
     install_zsh
     install_ghostty
