@@ -31,13 +31,21 @@ return {
             end
 
             -- Find and use pyenv environment
-            local pyenv_path = vim.fn.system("pyenv which python"):gsub("\n", "")
-            if vim.fn.filereadable(pyenv_path) == 1 then
-                return pyenv_path
+            if vim.fn.executable("pyenv") == 1 then
+                local pyenv_path = vim.fn.system("pyenv which python"):gsub("\n", "")
+                if vim.fn.filereadable(pyenv_path) == 1 then
+                    return pyenv_path
+                end
             end
 
             -- Default to system Python
-            return vim.fn.exepath("python3") or vim.fn.exepath("python") or "python"
+            local python3 = vim.fn.exepath("python3")
+            if python3 ~= "" then
+                return python3
+            end
+
+            local python = vim.fn.exepath("python")
+            return python ~= "" and python or "python"
         end
 
         -- Import plugins
@@ -160,13 +168,18 @@ return {
             end,
         }
 
+        local odin_collections = {}
+        if vim.env.ODIN_ROOT and vim.env.ODIN_ROOT ~= "" then
+            odin_collections = {
+                { name = "shared", path = vim.env.ODIN_ROOT },
+            }
+        end
+
         vim.lsp.config.ols = {
             capabilities = capabilities,
             init_options = {
                 checker_args = "-strict-style",
-                collections = {
-                    { name = "shared", path = odin_root }, -- Ensure odin_root is defined
-                },
+                collections = odin_collections,
             },
         }
         vim.lsp.config.graphql = {

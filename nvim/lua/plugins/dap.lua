@@ -96,44 +96,45 @@ return {
         ft = "python", -- Lazy-load on Python filetypes
         dependencies = { "mfussenegger/nvim-dap" },
         config = function()
-            local mason_registry = require("mason-registry")
-            mason_registry.refresh(function()
-                local path = "/usr/bin/python3"
-                require("dap-python").setup(path)
+            local function python3_path()
+                local path = vim.fn.exepath("python3")
+                return path ~= "" and path or "/usr/bin/python3"
+            end
 
-                -- Automatic venv detection (handles active VIRTUAL_ENV or common folders like .venv)
-                require("dap-python").resolve_python = function()
-                    local venv_path = os.getenv("VIRTUAL_ENV")
-                    if venv_path then
-                        return venv_path .. "/bin/python"
-                    else
-                        local cwd = vim.fn.getcwd()
-                        if vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
-                            return cwd .. "/.venv/bin/python"
-                        end
-                        return "/usr/bin/python" -- Fallback to system Python
+            require("dap-python").setup(python3_path())
+
+            -- Automatic venv detection (handles active VIRTUAL_ENV or common folders like .venv)
+            require("dap-python").resolve_python = function()
+                local venv_path = os.getenv("VIRTUAL_ENV")
+                if venv_path then
+                    return venv_path .. "/bin/python"
+                else
+                    local cwd = vim.fn.getcwd()
+                    if vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
+                        return cwd .. "/.venv/bin/python"
                     end
+                    return python3_path()
                 end
+            end
 
-                -- Optional: Example custom configuration
-                table.insert(require("dap").configurations.python, {
-                    type = "python",
-                    request = "launch",
-                    name = "Launch with active venv",
-                    program = "${file}",
-                    pythonPath = function()
-                        local venv = os.getenv("VIRTUAL_ENV")
-                        return venv and (venv .. "/bin/python") or "/usr/bin/python"
-                    end,
-                })
-            end)
+            -- Optional: Example custom configuration
+            table.insert(require("dap").configurations.python, {
+                type = "python",
+                request = "launch",
+                name = "Launch with active venv",
+                program = "${file}",
+                pythonPath = function()
+                    local venv = os.getenv("VIRTUAL_ENV")
+                    return venv and (venv .. "/bin/python") or python3_path()
+                end,
+            })
         end,
     },
     {
         "rcarriga/nvim-dap-ui",
         keys = {
             {
-                "<leader>du",
+                "<leader>dU",
                 function()
                     require("dapui").toggle()
                 end,
@@ -142,7 +143,6 @@ return {
         },
         dependencies = { "nvim-neotest/nvim-nio", "mfussenegger/nvim-dap" },
         config = function()
-            require("lazy").load({ plugins = { "nvim-nio" } })
             local dap, dapui = require("dap"), require("dapui")
             dapui.setup() -- Default setup; customize options as needed (see :help dapui.setup)
 

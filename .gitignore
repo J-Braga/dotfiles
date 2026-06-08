@@ -43,3 +43,4 @@ nvim/lazy-lock.json
 *.DS_Store
 */*.DS_Store
 /CLAUDE.md
+/.DS_Store

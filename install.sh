@@ -33,8 +33,8 @@ for arg in "$@"; do
     esac
 done
 
-if [ ! -d ~/.config ]; then
-    mkdir -p ~/.config
+if [ ! -d "$HOME/.config" ]; then
+    mkdir -p "$HOME/.config"
 fi
 
 unameOut="$(uname -s)"
@@ -50,7 +50,25 @@ esac
 # Usage: brew_install <name> [extra brew args...]
 brew_install() {
     local pkg="$1"; shift
-    if brew list "$pkg" >/dev/null 2>&1; then
+    local is_cask=false
+    local installed=false
+    for arg in "$@"; do
+        if [ "$arg" = "--cask" ]; then
+            is_cask=true
+        fi
+    done
+
+    if [ "$is_cask" = true ]; then
+        if brew list --cask "$pkg" >/dev/null 2>&1; then
+            installed=true
+        fi
+    else
+        if brew list "$pkg" >/dev/null 2>&1; then
+            installed=true
+        fi
+    fi
+
+    if [ "$installed" = true ]; then
         echo "  $pkg already installed, skipping"
     else
         brew install "$@" "$pkg"
@@ -79,11 +97,17 @@ install_brew() {
 
     brew_install font-mononoki-nerd-font --cask
     brew_install neovim --HEAD   # neovim nightly
+    brew_install tree-sitter-cli
     brew_install zig
     brew_install lazygit
     brew_install uv
     brew_install stylua
     brew_install tmux
+
+    if ! command -v tree-sitter >/dev/null 2>&1; then
+        echo "tree-sitter-cli installed but the tree-sitter command is not on PATH" >&2
+        exit 1
+    fi
 
     # virtualenvwrapper.sh must be on PATH for the oh-my-zsh virtualenvwrapper
     # plugin (see plugins=() in zshrc). uv symlinks it into ~/.local/bin.
@@ -95,16 +119,16 @@ install_brew() {
 reinstall_cleanup() {
     echo "Removing managed dotfiles and generated shell/editor state..."
 
-    rm -f ~/.zshrc ~/.tmux.conf ~/.zcompdump*
-    rm -rf ~/.config/alias
-    rm -rf ~/.config/alacritty
-    rm -rf ~/.config/nvim
+    rm -f "$HOME/.zshrc" "$HOME/.tmux.conf" "$HOME"/.zcompdump*
+    rm -rf "$HOME/.config/alias"
+    rm -rf "$HOME/.config/alacritty"
+    rm -rf "$HOME/.config/nvim"
 
-    rm -rf ~/.oh-my-zsh
+    rm -rf "$HOME/.oh-my-zsh"
 
-    rm -rf ~/.local/share/nvim
-    rm -rf ~/.local/state/nvim
-    rm -rf ~/.cache/nvim
+    rm -rf "$HOME/.local/share/nvim"
+    rm -rf "$HOME/.local/state/nvim"
+    rm -rf "$HOME/.cache/nvim"
 
     rm -f "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
 }
@@ -121,12 +145,6 @@ install_zsh() {
         git clone https://github.com/zsh-users/zsh-autosuggestions.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
     fi
 
-    #zsh-syntax-highlighting plugin
-    if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting" ]; then
-        echo "installing zsh-syntax-highlighting"
-        git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
-    fi
-
     #zsh-fast-syntax-highlighting plugin
     if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting" ]; then
         echo "installing fast-syntax-highlighting"
@@ -139,18 +157,27 @@ link_managed_path() {
     local source="$1"
     local target="$2"
 
+    if [ ! -e "$source" ]; then
+        echo "Missing source for link: $source" >&2
+        exit 1
+    fi
+
+    case "$target" in
+        "$HOME"/*) ;;
+        *)
+            echo "Refusing to manage path outside HOME: $target" >&2
+            exit 1
+            ;;
+    esac
+
     mkdir -p "$(dirname "$target")"
     rm -rf "$target"
-    ln -sfn "$source" "$target"
+    ln -s "$source" "$target"
     echo "linked $target -> $source"
 }
 
 install_ghostty() {
-    if ! command -v ghostty >/dev/null 2>&1; then
-        echo "installing ghostty"
-        brew install --cask ghostty
-    fi
-
+    brew_install ghostty --cask
     link_managed_path "$DOTFILES/ghostty" "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
 }
 
@@ -170,11 +197,11 @@ link_dotfiles() {
 
 apply_mac_default() {
     defaults write com.apple.dock static-only -bool true
-    killall Dock
+    killall Dock || true
 
     defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
     defaults write com.apple.finder _FXSortFoldersFirst -bool true
-    killall Finder
+    killall Finder || true
 
     defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
     defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true

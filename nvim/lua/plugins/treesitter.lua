@@ -1,69 +1,56 @@
+local parsers = {
+    "json",
+    "jinja",
+    "javascript",
+    "typescript",
+    "tsx",
+    "yaml",
+    "html",
+    "css",
+    "markdown",
+    "markdown_inline",
+    "graphql",
+    "bash",
+    "lua",
+    "vim",
+    "dockerfile",
+    "gitignore",
+    "query",
+    "vimdoc",
+    "c",
+    "c_sharp",
+    "odin",
+    "python",
+    "terraform",
+    "go",
+    "zig",
+}
+
 return {
     "nvim-treesitter/nvim-treesitter",
-    event = { "BufReadPre", "BufNewFile" },
+    branch = "main",
+    lazy = false,
     build = ":TSUpdate",
     dependencies = {
         "windwp/nvim-ts-autotag",
     },
     config = function()
-        -- import nvim-treesitter plugin
-        local treesitter = require("nvim-treesitter.configs")
-        local parser_install_dir = vim.fn.stdpath("data") .. "/treesitter"
+        local treesitter = require("nvim-treesitter")
 
-        vim.opt.runtimepath:prepend(parser_install_dir)
+        treesitter.setup({
+            install_dir = vim.fn.stdpath("data") .. "/treesitter",
+        })
 
-        -- configure treesitter
-        treesitter.setup({ -- enable syntax highlighting
-            parser_install_dir = parser_install_dir,
-            highlight = {
-                enable = true,
-                --disable = {},
-                --additional_vim_regex_highlighting = false,
-            },
-            -- enable indentation
-            indent = { enable = true },
-            --
-            -- enable autotagging (w/ nvim-ts-autotag plugin)
-            autotag = {
-                enable = true,
-            },
-            -- ensure these language parsers are installed
-            ensure_installed = {
-                "json",
-                "jinja",
-                "javascript",
-                "typescript",
-                "tsx",
-                "yaml",
-                "html",
-                "css",
-                "markdown",
-                "markdown_inline",
-                "graphql",
-                "bash",
-                "lua",
-                "vim",
-                "dockerfile",
-                "gitignore",
-                "query",
-                "vimdoc",
-                "c",
-                "c_sharp",
-                "odin",
-                "python",
-                "terraform",
-                "go",
-                "zig",
-            },
-            incremental_selection = {
-                enable = true,
-                keymaps = {
-                    init_selection = "<C-space>",
-                    node_incremental = "<C-space>",
-                    scope_incremental = false,
-                    node_decremental = "<bs>",
-                },
-            },
+        treesitter.install(parsers)
+
+        vim.api.nvim_create_autocmd("FileType", {
+            group = vim.api.nvim_create_augroup("UserTreesitter", { clear = true }),
+            pattern = "*",
+            callback = function()
+                if pcall(vim.treesitter.start) then
+                    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+                end
+            end,
         })
     end,
 }

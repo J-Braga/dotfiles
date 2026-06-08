@@ -1,6 +1,7 @@
 # Function to check if pre-commit hook exists
 check_pre_commit() {
     local repo_path="$1"  # Accept folder path as argument
+    local current_dir
     current_dir=$(basename "$PWD")
     # Check if the current directory is the specified repo folder
     if [ "$current_dir" = "$repo_path" ]; then
@@ -18,9 +19,10 @@ check_pre_commit() {
 
 # Override cd 
 cd() {
-    builtin cd "$@";
-    rm -f '.DS_Store'; ls -FGlAhp;
-    check_pre_commit "magnet_deployments";
+    builtin cd "$@" || return
+    rm -f '.DS_Store'
+    ls -FGlAhp
+    check_pre_commit "magnet_deployments"
 }
 
 export TERM=xterm-256color
@@ -67,6 +69,9 @@ export KEYTIMEOUT=1
 
 # Suggest from history only; completion suggestions spawn helper zsh workers.
 ZSH_AUTOSUGGEST_STRATEGY=(history)
+
+# Let the Oh My Zsh theme render the active virtualenv without rewriting PS1.
+export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 # virtualenvwrapper is installed via `uv tool install` (see install.sh), which
 # isolates its module in its own venv. Point the omz plugin at that interpreter
@@ -213,8 +218,10 @@ export PATH="$PATH:$HOME/.local/bin"
 
 
 export ANDROID_HOME="$HOME/Library/Android/sdk"
-export PATH="$PATH:$ANDROID_HOME/platform-tools"
-
-export ANDROID_HOME="/opt/homebrew/share/android-commandlinetools"
 export NDK_HOME="$ANDROID_HOME/ndk/27.2.12479018"
-export PATH="$PATH:$ANDROID_HOME/platform-tools"
+if [ -d "$ANDROID_HOME/platform-tools" ]; then
+  export PATH="$PATH:$ANDROID_HOME/platform-tools"
+fi
+if [ -d "/opt/homebrew/share/android-commandlinetools/bin" ]; then
+  export PATH="$PATH:/opt/homebrew/share/android-commandlinetools/bin"
+fi
