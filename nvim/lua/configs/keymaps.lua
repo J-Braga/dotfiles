@@ -23,7 +23,7 @@ keymap("n", "<leader>se", "<C-w>=", opts)
 keymap("n", "<leader>sx", ":close<CR>", opts)
 
 -- Buffer
-keymap("n", "<leader>bd", ":bd<CR>", opts)
+keymap("n", "<leader>bd", ":bp | bd #<CR>", opts)
 
 -- no hl
 keymap("n", "<leader>h", ":set hlsearch!<CR>", opts)

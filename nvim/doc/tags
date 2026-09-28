@@ -1,0 +1,6 @@
+:HideComments	comment-hider.txt	/*:HideComments*
+:HideCommentsToggle	comment-hider.txt	/*:HideCommentsToggle*
+:ShowComments	comment-hider.txt	/*:ShowComments*
+comment-hider-setup	comment-hider.txt	/*comment-hider-setup*
+comment-hider-usage	comment-hider.txt	/*comment-hider-usage*
+comment-hider.txt	comment-hider.txt	/*comment-hider.txt*

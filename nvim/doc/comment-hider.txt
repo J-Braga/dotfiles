@@ -1,0 +1,43 @@
+*comment-hider.txt*  Hide standalone comment lines with Tree-sitter
+
+===============================================================================
+USAGE                                                     *comment-hider-usage*
+
+The plugin hides comment nodes that occupy otherwise empty lines. Comments at
+the end of code lines remain visible. A Tree-sitter parser and highlights query
+must be installed for the current buffer's language.
+
+While comments are hidden, j, k, <Down>, and <Up> skip concealed rows. Counts
+apply to visible rows, so 3j moves down three visible lines. Editing and saving
+never removes comments from the buffer or file. The hidden view refreshes after
+normal-mode changes and after leaving Insert mode.
+
+                                                     *:HideCommentsToggle*
+:HideCommentsToggle     Toggle standalone comment lines in the current buffer.
+
+                                                           *:HideComments*
+:HideComments           Hide standalone comment lines in the current buffer.
+
+                                                           *:ShowComments*
+:ShowComments           Show comments in the current buffer.
+
+The default normal-mode mapping is <leader>tc.
+
+===============================================================================
+CONFIGURATION                                             *comment-hider-setup*
+
+The defaults are: >lua
+
+    require("comment_hider").setup({
+        keymap = "<leader>tc",
+        conceallevel = 2,
+        concealcursor = "",
+        refresh_delay = 80,
+        skip_hidden_lines = true,
+        center_after_move = true,
+        notify = true,
+    })
+<
+Set `keymap = false` to disable the default mapping.
+
+vim:tw=78:ts=8:noet:ft=help:norl:
