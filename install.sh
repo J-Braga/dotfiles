@@ -205,6 +205,10 @@ apply_mac_default() {
 
     defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
     defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
+    # Fastest key repeat the System Settings sliders allow (applies after re-login).
+    defaults write -g InitialKeyRepeat -int 15
+    defaults write -g KeyRepeat -int 2
 }
 
 if [ "${machine}" = "Mac" ]; then

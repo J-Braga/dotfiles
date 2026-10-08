@@ -24,10 +24,33 @@ return {
   
       -- loads vscode style snippets from installed plugins (e.g. friendly-snippets)
       require("luasnip.loaders.from_vscode").lazy_load()
-  
+
+      -- zls never suggests uN/iN (arbitrary-width ints), so offer the common ones in zig buffers.
+      local zig_int_items = {}
+      for _, sign in ipairs({ "u", "i" }) do
+        for _, bits in ipairs({ 8, 16, 32, 64, 128 }) do
+          table.insert(zig_int_items, {
+            label = sign .. bits,
+            kind = cmp.lsp.CompletionItemKind.TypeParameter,
+          })
+        end
+      end
+      cmp.register_source("zig_ints", {
+        is_available = function()
+          return vim.bo.filetype == "zig"
+        end,
+        complete = function(_, _, callback)
+          callback(zig_int_items)
+        end,
+      })
+
       cmp.setup({
         completion = {
           completeopt = "menu,menuone,preview,noselect",
+        },
+        -- zls can take >500ms (the default) on big translate-c modules like SDL's c.zig.
+        performance = {
+          fetching_timeout = 2000,
         },
         snippet = { -- configure how nvim-cmp interacts with snippet engine
           expand = function(args)
@@ -46,6 +69,7 @@ return {
         -- sources for autocompletion
         sources = cmp.config.sources({
           { name = "nvim_lsp"},
+          { name = "zig_ints" },
           { name = "luasnip" }, -- snippets
           { name = "buffer" }, -- text within current buffer
           { name = "path" }, -- file system paths

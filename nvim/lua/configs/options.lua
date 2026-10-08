@@ -20,13 +20,17 @@ opt.listchars = {
     tab = "▸ ", -- Optional: Arrow + space for tabs
     eol = "¬", -- Optional: Symbol for end-of-line
 }
-opt.wrap = false
+opt.wrap = true -- wrap long lines instead of running them off screen
+opt.linebreak = true -- break at word boundaries, not mid-word
+opt.breakindent = true -- keep the wrapped part at the original indent
+opt.showbreak = "↪ " -- mark continuation lines so they read as wrapped
 
 -- search settings
 opt.ignorecase = true -- ignore case when searching
 opt.smartcase = true -- if you include mixed case in your search, assumes you want case-sensitive
 
 opt.cursorline = true
+opt.scrolloff = 999 -- keep the cursor vertically centered without remapping every motion
 
 -- turn on termguicolors for tokyonight colorscheme to work
 -- (have to use iterm2 or any other true color terminal)
@@ -55,4 +59,14 @@ vim.filetype.add({
     extension = {
         j2 = "jinja",
     },
+})
+
+-- Keep terminals out of the <S-h>/<S-l> buffer cycle. An unlisted buffer stays
+-- open and visible in its window; :bnext/:bprevious simply skip it, so a
+-- terminal parked in a vsplit no longer appears in the other window.
+vim.api.nvim_create_autocmd("TermOpen", {
+    group = vim.api.nvim_create_augroup("UnlistTerminals", { clear = true }),
+    callback = function(args)
+        vim.bo[args.buf].buflisted = false
+    end,
 })

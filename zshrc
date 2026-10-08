@@ -206,44 +206,10 @@ fi
 export PATH=$PATH:/usr/local/sbin
 #export NVIM_LISTEN_ADDRESS='/tmp/nvimsocket nvim'
 
-# bun completions
-#[ -s "~/.bun/_bun" ] && source "~/.bun/_bun"
-
-# bun
-#export BUN_INSTALL="$HOME/.bun"
-#export PATH="$BUN_INSTALL/bin:$PATH"
-
 export PATH="$PATH:$HOME/.local/bin"
 [ -f ~/.config/forgejo/token.env ] && source ~/.config/forgejo/token.env
 
-
-export ANDROID_HOME="$HOME/Library/Android/sdk"
-export NDK_HOME="$ANDROID_HOME/ndk/27.2.12479018"
-if [ -d "$ANDROID_HOME/platform-tools" ]; then
-  export PATH="$PATH:$ANDROID_HOME/platform-tools"
-fi
 if [ -d "/opt/homebrew/share/android-commandlinetools/bin" ]; then
   export PATH="$PATH:/opt/homebrew/share/android-commandlinetools/bin"
 fi
-# ---- Vulkan (macOS / MoltenVK) --------------------------------------------
-# The Vulkan SDK's loader lives in /usr/local/lib and Homebrew's in
-# /opt/homebrew/lib. Do NOT mix them: pointing DYLD at one while
-# VK_ICD_FILENAMES pins a driver from the other is how you get
-# "IncompatibleDriver" or a missing-extension error that depends on which
-# terminal you launched from.
-#
-# Nothing is exported by default. Apps should locate the loader themselves
-# (SDL: SDL_Vulkan_LoadLibrary with an absolute path, or the SDL_VULKAN_LIBRARY
-# hint). Uncomment ONE stanza below only if a prebuilt tool needs it.
-
-# -- LunarG SDK (/usr/local) --
-# export DYLD_FALLBACK_LIBRARY_PATH="/usr/local/lib:$DYLD_FALLBACK_LIBRARY_PATH"
-
-# -- Homebrew (vulkan-loader + molten-vk) --
-# export DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix)/lib:$DYLD_FALLBACK_LIBRARY_PATH"
-# export VK_ICD_FILENAMES="$(brew --prefix)/etc/vulkan/icd.d/MoltenVK_icd.json"
-
-# Force a specific loader for SDL3 apps without touching DYLD at all:
-# export SDL_VULKAN_LIBRARY=/usr/local/lib/libvulkan.1.dylib
-# ---------------------------------------------------------------------------
 export PATH="$PATH:$(go env GOPATH)/bin"

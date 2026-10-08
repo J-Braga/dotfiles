@@ -53,6 +53,39 @@ return {
 
         local keymap = vim.keymap -- for conciseness
 
+        -- Go to definition, but if the target file is already showing in another split of this
+        -- tab, jump there instead of replacing the current window's buffer.
+        local function goto_definition()
+            vim.lsp.buf.definition({
+                on_list = function(list)
+                    if #list.items ~= 1 then
+                        vim.fn.setqflist({}, " ", list)
+                        vim.cmd("botright copen")
+                        return
+                    end
+                    local item = list.items[1]
+                    local bufnr = item.bufnr or vim.fn.bufadd(item.filename)
+                    local target_win = vim.api.nvim_get_current_win()
+                    if vim.api.nvim_win_get_buf(target_win) ~= bufnr then
+                        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+                            if vim.api.nvim_win_get_buf(win) == bufnr then
+                                target_win = win
+                                break
+                            end
+                        end
+                    end
+                    vim.cmd("normal! m'") -- so <C-o> returns to the call site
+                    vim.api.nvim_set_current_win(target_win)
+                    if vim.api.nvim_win_get_buf(target_win) ~= bufnr then
+                        vim.bo[bufnr].buflisted = true
+                        vim.api.nvim_win_set_buf(target_win, bufnr)
+                    end
+                    vim.api.nvim_win_set_cursor(target_win, { item.lnum, math.max(item.col - 1, 0) })
+                    vim.cmd("normal! zv")
+                end,
+            })
+        end
+
         vim.api.nvim_create_autocmd("LspAttach", {
             group = vim.api.nvim_create_augroup("UserLspConfig", {}),
             callback = function(ev)
@@ -68,7 +101,7 @@ return {
 
                 opts.desc = "Show LSP definitions"
                 --keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
-                keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+                keymap.set("n", "gd", goto_definition, opts)
 
                 opts.desc = "Show LSP implementations"
                 keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
@@ -106,6 +139,8 @@ return {
 
         -- Enable autocompletion
         local capabilities = cmp_nvim_lsp.default_capabilities()
+        -- Apply cmp capabilities to every server (zls etc. are auto-enabled by mason-lspconfig).
+        vim.lsp.config("*", { capabilities = capabilities })
 
         --capabilities.server_capabili:
         -- Change Diagnostic symbols in the sign column

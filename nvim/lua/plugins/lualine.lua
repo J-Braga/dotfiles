@@ -5,9 +5,12 @@ return {
         local lualine = require("lualine")
         local lazy_status = require("lazy.status") -- to configure lazy pending updates count
 
+        -- Own colorschemes (colors/personal*.lua) ship a palette in custom.<name>; build the
+        -- bar from it. Plugin colorschemes like nordic bring their own lualine theme.
         local palette_module = "custom." .. (vim.g.colors_name or "personal")
         local ok, theme = pcall(require, palette_module)
-        local colors = (ok and theme.palette) or require("custom.personal").palette
+        local has_palette = ok and type(theme) == "table" and theme.palette ~= nil
+        local colors = has_palette and theme.palette or require("custom.personal").palette
 
         local my_lualine_theme = {
             normal = {
@@ -45,14 +48,14 @@ return {
         -- configure lualine with modified theme
         lualine.setup({
             options = {
-                theme = my_lualine_theme,
+                theme = has_palette and my_lualine_theme or "auto",
             },
             sections = {
                 lualine_x = {
                     {
                         lazy_status.updates,
                         cond = lazy_status.has_updates,
-                        color = { fg = colors.warning },
+                        color = "DiagnosticWarn",
                     },
                     { "encoding" },
                     { "fileformat" },

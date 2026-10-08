@@ -31,6 +31,7 @@ alias cv="python3 -m virtualenv venv"
 alias python="python3"
 alias lg="lazygit"
 alias vim=nvim
+alias n="nvim ."
 
 
 mcd () { mkdir -p "$1" && cd "$1"; }        # mcd:          Makes new Dir and jumps inside
