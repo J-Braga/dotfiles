@@ -212,4 +212,7 @@ export PATH="$PATH:$HOME/.local/bin"
 if [ -d "/opt/homebrew/share/android-commandlinetools/bin" ]; then
   export PATH="$PATH:/opt/homebrew/share/android-commandlinetools/bin"
 fi
-export PATH="$PATH:$(go env GOPATH)/bin"
+
+if command -v go >/dev/null 2>&1; then
+  export PATH="$PATH:$(go env GOPATH)/bin"
+fi
