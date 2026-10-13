@@ -35,6 +35,14 @@ return {
                 vim.api.nvim_feedkeys(vim.keycode("<Esc>"), "n", false)
             end
 
+            local function yank_names_any_mode()
+                if vim.fn.mode():match("^[vV\22]") then
+                    yank_selected_names()
+                else
+                    yank_line_names()
+                end
+            end
+
             require("oil").setup({
                 columns = { "icon" },
                 keymaps = {
@@ -46,11 +54,11 @@ return {
                     ["<ESCAPE>"] = "actions.close",
                     -- Yanks copy clean names instead of raw lines with the hidden "/001" entry id
                     -- (gives up oil's yank/paste-to-copy-files, which is unused).
+                    -- One "Y" entry covers both modes: a second ["Y"] key would overwrite the first.
                     ["yy"] = { callback = yank_line_names, desc = "Yank entry names", mode = "n" },
-                    ["Y"] = { callback = yank_line_names, desc = "Yank entry names", mode = "n" },
+                    ["Y"] = { callback = yank_names_any_mode, desc = "Yank entry names", mode = { "n", "x" } },
                     ["gY"] = { "actions.yank_entry", desc = "Yank entry full path" },
                     ["y"] = { callback = yank_selected_names, desc = "Yank selected names", mode = "x" },
-                    ["Y"] = { callback = yank_selected_names, desc = "Yank selected names", mode = "x" },
                 },
                 win_options = {
                     winbar = "%{v:lua.CustomOilBar()}",

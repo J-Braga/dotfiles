@@ -27,7 +27,6 @@ return {
                 "graphql",
                 "ols",
                 "pyright",
-                ---"gopls",
                 "zls",
             },
         })

@@ -11,7 +11,6 @@ return {
                 highlight = highlight,
                 char = "┊",
             },
-            scope = { highlight = highlight },
             whitespace = {
                 remove_blankline_trail = false,
             },

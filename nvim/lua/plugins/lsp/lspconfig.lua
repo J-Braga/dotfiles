@@ -4,14 +4,9 @@ return {
     dependencies = {
         "hrsh7th/cmp-nvim-lsp",
         { "antosha417/nvim-lsp-file-operations", config = true },
-        { "folke/neodev.nvim", opts = {} },
-        { "williamboman/mason.nvim" },
-        { "williamboman/mason-lspconfig.nvim" },
+        "williamboman/mason.nvim",
     },
     config = function()
-        -- Initialize mason.nvim
-        require("mason").setup()
-
         local function remove_bin(path)
             -- Find the position of "bin/python"
             local position = path:find("bin/python")
@@ -100,7 +95,6 @@ return {
                 keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
 
                 opts.desc = "Show LSP definitions"
-                --keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
                 keymap.set("n", "gd", goto_definition, opts)
 
                 opts.desc = "Show LSP implementations"
@@ -124,10 +118,14 @@ return {
                 keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
 
                 opts.desc = "Go to previous diagnostic"
-                keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+                keymap.set("n", "[d", function()
+                    vim.diagnostic.jump({ count = -1, float = true })
+                end, opts)
 
                 opts.desc = "Go to next diagnostic"
-                keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+                keymap.set("n", "]d", function()
+                    vim.diagnostic.jump({ count = 1, float = true })
+                end, opts)
 
                 opts.desc = "Show documentation for what is under cursor"
                 keymap.set("n", "K", vim.lsp.buf.hover, opts)
@@ -137,33 +135,17 @@ return {
             end,
         })
 
-        -- Enable autocompletion
-        local capabilities = cmp_nvim_lsp.default_capabilities()
-        -- Apply cmp capabilities to every server (zls etc. are auto-enabled by mason-lspconfig).
-        vim.lsp.config("*", { capabilities = capabilities })
-
-        --capabilities.server_capabili:
-        -- Change Diagnostic symbols in the sign column
-        -- local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-        -- for type, icon in pairs(signs) do
-        -- 	local hl = "DiagnosticSign" .. type
-        -- 	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-        -- end
-
-        require("mason-lspconfig").setup({
-            ensure_installed = { "lua_ls", "graphql", "ols", "pyright" }, -- Ensure these servers are installed
-            automatic_installation = true,
-        })
+        -- Apply cmp capabilities to every server (servers are auto-enabled by mason-lspconfig,
+        -- set up in mason.lua).
+        vim.lsp.config("*", { capabilities = cmp_nvim_lsp.default_capabilities() })
 
         vim.lsp.config.lua_ls = {
-            capabilities = capabilities,
-            --on_attach = on_attach,
             on_init = function(client)
                 if client.workspace_folders then
                     local path = client.workspace_folders[1].name
                     if
                         path ~= vim.fn.stdpath("config")
-                        and (vim.loop.fs_stat(path .. "/.luarc.json") or vim.loop.fs_stat(path .. "/.luarc.jsonc"))
+                        and (vim.uv.fs_stat(path .. "/.luarc.json") or vim.uv.fs_stat(path .. "/.luarc.jsonc"))
                     then
                         return
                     end
@@ -189,17 +171,12 @@ return {
                 },
             },
         }
-        vim.lsp.enable("lua_ls")
-
-        --vim.lsp.config.gopls = {
-        --	capabilities = capabilities
-        --}
 
         vim.lsp.config.pyright = {
-            capabilities = capabilities,
             before_init = function(_, config)
-                config.settings.python.pythonPath = get_python_path()
-                config.settings.python.venv = remove_bin(get_python_path())
+                local python_path = get_python_path()
+                config.settings.python.pythonPath = python_path
+                config.settings.python.venv = remove_bin(python_path)
             end,
         }
 
@@ -211,14 +188,12 @@ return {
         end
 
         vim.lsp.config.ols = {
-            capabilities = capabilities,
             init_options = {
                 checker_args = "-strict-style",
                 collections = odin_collections,
             },
         }
         vim.lsp.config.graphql = {
-            capabilities = capabilities,
             filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
         }
     end,

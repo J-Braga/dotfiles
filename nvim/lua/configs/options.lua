@@ -1,5 +1,3 @@
-vim.cmd("let g:netrw_liststyle = 3")
-
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
@@ -9,7 +7,7 @@ opt.relativenumber = true
 opt.number = true
 
 -- tabs & indentation
-opt.tabstop = 4 -- 2 spaces for tabs (prettier default)
+opt.tabstop = 4 -- width of a literal tab
 opt.shiftwidth = 2 -- 2 spaces for indent width
 opt.expandtab = true -- expand tab to spaces
 opt.autoindent = true -- copy indent from current line when starting new one
@@ -32,18 +30,13 @@ opt.smartcase = true -- if you include mixed case in your search, assumes you wa
 opt.cursorline = true
 opt.scrolloff = 999 -- keep the cursor vertically centered without remapping every motion
 
--- turn on termguicolors for tokyonight colorscheme to work
--- (have to use iterm2 or any other true color terminal)
 opt.termguicolors = true
---opt.background = "dark" -- colorschemes that can be light or dark will be made dark
 opt.signcolumn = "yes" -- show sign column so that text doesn't shift
---opt.signcolumn = "auto:3"
 
 -- backspace
 opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or insert mode start position
 
-vim.opt.autowrite = true -- Enable auto write
--- clipboard
+opt.autowrite = true -- Enable auto write
 
 opt.completeopt = "menu,menuone,noselect"
 opt.clipboard = "unnamedplus" -- Sync with system clipboard

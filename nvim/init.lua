@@ -1,5 +1,5 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
     vim.fn.system({
         "git",
         "clone",
@@ -27,11 +27,7 @@ require("lazy").setup({
 }, {
     checker = {
         enabled = true,
-        -- notify = false,
     },
-    -- change_detection = {
-    --   notify = false,
-    -- },
     performance = {
         rtp = {
             disabled_plugins = {
@@ -69,8 +65,4 @@ require("lazy").setup({
 
 vim.o.guifont = "Consolas:h17"
 
---vim.notify = require("notify")
---require("custom.rename")
---require("custom.zig_build")
---vim.api.nvim_set_hl(0, "Whitespace", { fg = "#B0B1B1" }) -- Blue foreground, dark gray background
 vim.api.nvim_set_hl(0, "Whitespace", { fg = "#126367" })

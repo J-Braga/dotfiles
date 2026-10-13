@@ -27,43 +27,24 @@ return {
                     name = "Build and Launch Zig Executable",
                     type = "codelldb",
                     request = "launch",
-                    --program = "${workspaceFolder}/zig-out/bin/${workspaceFolderBasename}", -- Assumes default Zig build output; adjust if custom
+                    -- nvim-dap has no preLaunchTask, so build here before resolving the binary.
                     program = function()
                         local cwd = vim.fn.getcwd()
-                        local basename = vim.fn.fnamemodify(cwd, ":t"):gsub("-", "_") -- Replace hyphens with underscores
-                        if vim.fn.filereadable(cwd .. "/build.zig") == 1 then
-                            return cwd .. "/zig-out/bin/" .. basename
-                        else
-                            return vim.fn.expand("%:r"):gsub("-", "_") -- For single files: file without extension, with replacement
+                        if vim.fn.filereadable(cwd .. "/build.zig") ~= 1 then
+                            return (vim.fn.expand("%:r"):gsub("-", "_")) -- single file: name without extension
                         end
+                        vim.fn.system("zig build")
+                        if vim.v.shell_error ~= 0 then
+                            vim.notify("Zig build failed!", vim.log.levels.ERROR)
+                            return dap.ABORT
+                        end
+                        local basename = vim.fn.fnamemodify(cwd, ":t"):gsub("-", "_")
+                        return cwd .. "/zig-out/bin/" .. basename
                     end,
                     cwd = "${workspaceFolder}",
                     stopOnEntry = false,
                     args = {},
-                    preLaunchTask = function()
-                        local build_cmd = "zig build" -- Or "zig build-exe yourfile.zig -O Debug" for single files
-                        vim.fn.system(build_cmd) -- Run build; check exit code if needed for errors
-                        -- Optional: Notify on failure
-                        if vim.v.shell_error ~= 0 then
-                            vim.notify("Zig build failed!", vim.log.levels.ERROR)
-                        end
-                    end,
                 },
-                --{
-                --    name = "Build and Debug Zig Test",
-                --    type = "codelldb",
-                --    request = "launch",
-                --    program = "${workspaceFolder}/zig-out/bin/${workspaceFolderBasename}-test", -- Assumes zig test output
-                --    cwd = "${workspaceFolder}",
-                --    args = { "--test-filter", vim.fn.input("Test filter (optional): ") },
-                --    preLaunchTask = function()
-                --        local test_build_cmd = "zig build test" -- Builds tests with debug symbols
-                --        vim.fn.system(test_build_cmd)
-                --        if vim.v.shell_error ~= 0 then
-                --            vim.notify("Zig test build failed!", vim.log.levels.ERROR)
-                --        end
-                --    end,
-                --},
             }
 
             vim.api.nvim_set_hl(0, "DapBreakpoint", { ctermbg = 0, bg = "#993939" })
