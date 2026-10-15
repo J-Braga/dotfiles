@@ -208,7 +208,7 @@ apply_mac_default() {
 
     # Fastest key repeat the System Settings sliders allow (applies after re-login).
     defaults write -g KeyRepeat -int 1          # repeat speed: 2 → 1, twice as fast
-    defaults write -g InitialKeyRepeat -int 10  # delay before repeat starts: 15 → 10
+    defaults write -g InitialKeyRepeat -int 15  # delay before repeat starts: 15 → 10
     defaults write -g ApplePressAndHoldEnabled -bool false  # holding j repeats instead of showing the accent popup
 }
 

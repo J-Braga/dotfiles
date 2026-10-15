@@ -7,9 +7,13 @@
 --   build.zig     -> zig build <step>   (step picked from build.zig, cached)
 --   bun.lock(b)   -> bun run <script>   (script picked from package.json)
 --   package.json  -> bun run <script>   (bun is preferred over npm here)
---   build.odin    -> odin run build.odin -file [-- run|release]
+--   build.odin    -> odin run build.odin -file [-- run|debug|release]
 --   ols.json      -> odin <cmd> .       (run/build/check/test; Odin has no build file,
 --                                        so an .odin buffer alone falls back to its dir)
+--
+-- <leader>bg builds the project and opens it in the RAD Debugger (build.odin's
+-- `debug` command). Once picked, <leader>bb and <leader>bl repeat it like any
+-- other target.
 
 local M = {}
 
@@ -17,6 +21,7 @@ local config = {
 	keymap = "<leader>bb",
 	rerun_keymap = "<leader>bl",
 	pick_keymap = "<leader>bp",
+	debug_keymap = "<leader>bg",
 	size = 15,
 	position = "botright",
 	-- The split is only worth looking at when something went wrong: close it on
@@ -37,9 +42,13 @@ local config = {
 local odin_targets = { "run", "build", "check", "test" }
 
 -- A project-local build.odin script: target -> arguments passed after `--`.
--- "run" builds debug, then launches the game.
-local odin_script_args = { run = " -- run", debug = "", release = " -- release" }
-local odin_script_targets = { "run", "debug", "release" }
+-- "run" builds debug, then launches the game; "debug" launches it in the RAD
+-- Debugger, left waiting so raddbg.lua can set breakpoints before sending `run`;
+-- "build" only compiles.
+local odin_script_args = { run = " -- run", debug = " -- debug wait", build = "", release = " -- release" }
+local odin_script_targets = { "run", "debug", "build", "release" }
+-- The target each project kind uses to open the debugger; others have none yet.
+local debug_target = { odin_script = "debug" }
 
 -- Marker -> project kind, checked in this order so a Zig project that also
 -- carries a package.json still builds with Zig.
@@ -430,6 +439,13 @@ end
 local function run(project, target)
 	last_target[project.root] = target
 	open_terminal(command_for(project, target), project.root)
+	-- Breakpoints toggled in Neovim before the debugger existed are waiting for it.
+	if target == debug_target[project.kind] then
+		local ok, raddbg = pcall(require, "custom.raddbg")
+		if ok then
+			raddbg.on_debugger_launch()
+		end
+	end
 end
 
 -- Pick a target, remembering the choice for this project root.
@@ -494,6 +510,24 @@ function M.pick()
 	choose(project, function(target)
 		run(project, target)
 	end)
+end
+
+-- <leader>bg: build, then open the result in the debugger. Remembered like any
+-- other target, so <leader>bb keeps debugging until a different one is picked.
+function M.debug()
+	local project = find_project(vim.api.nvim_get_current_buf())
+	if not project then
+		notify("No project found above this file", vim.log.levels.WARN)
+		return
+	end
+
+	local target = debug_target[project.kind]
+	if not target then
+		notify(("No debugger launch for %s projects"):format(project.kind), vim.log.levels.WARN)
+		return
+	end
+
+	run(project, target)
 end
 
 -- <leader>bl: repeat the last target for this project without prompting.
@@ -579,6 +613,7 @@ function M.setup(opts)
 
 	vim.api.nvim_create_user_command("ProjectBuild", M.build, { desc = "Build and run the current project" })
 	vim.api.nvim_create_user_command("ProjectBuildPick", M.pick, { desc = "Pick a build target and run it" })
+	vim.api.nvim_create_user_command("ProjectDebug", M.debug, { desc = "Build and open the project in the debugger" })
 	vim.api.nvim_create_user_command("ProjectBuildStop", M.stop, { desc = "Stop the running build" })
 	vim.api.nvim_create_user_command("ProjectBuildToggle", M.toggle, { desc = "Show or hide the build output" })
 
@@ -587,6 +622,9 @@ function M.setup(opts)
 	end
 	if config.pick_keymap then
 		vim.keymap.set("n", config.pick_keymap, M.pick, { desc = "Pick build target", silent = true })
+	end
+	if config.debug_keymap then
+		vim.keymap.set("n", config.debug_keymap, M.debug, { desc = "Build and open in debugger", silent = true })
 	end
 	if config.stop_keymap then
 		vim.keymap.set("n", config.stop_keymap, M.stop, { desc = "Kill the running build", silent = true })
